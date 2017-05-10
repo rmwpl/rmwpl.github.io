@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>Elephant-watching &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/postgresql/2016/01/elephant-watching.html">Elephant-watching</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2016-01-10T20:38:55 GMT &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/postgresql/2016/01/elephant-watching.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>Proper monitoring is the key to keeping your system in good health and it's especially important in the database field. No matter if you have a busy systems processing a lot of transactions each second or you just want to keep tabs on your data warehouse handeling only few heavy queries - you want to graph most of the metrics in order to be able to see, how they're trending. There are many solutions for doing that, but let me tell you a secret - in this endeavour <a href="http://grafana.org/">Grafana</a> will be your best friend.</p>
+
+<p><em>This article was <a href="https://www.compose.io/articles/elephant-watching-monitoring-postgresql/">published</a> by <a href="https://www.compose.io">compose.io</a> as a part of <a href="https://www.compose.io/write-stuff/">Write Stuff</a> programme. Unlike other articles on my blog, this one is licensed under the terms of CC BY-NC-SA 4.0</em></p>
+
+<h1 id="thegoal">The goal</h1>
+
+<p>Usually when talking about monitoring we really mean monitoring and alerting - those two are a bit different, but complementary and there's very little point in doing one but not the other. We can monitor events and metric. When an event occurs we may decide to alert on it. But usually it's better to act beforehand.</p>
+
+<p>Probably the best way to keep track of your metrics' trends is to visualise them with graphs. And that's where Grafana comes in. Unlike one of my favourite systems - Munin - Grafana allows the creation of dynamic graphs and let's you choose a time period in a very flexible fashion.</p>
+
+<p>For busy OLTP systems it's important to have a live overview of what's happening, and the biggest pain with Munin was the need to wait (by default 5 minutes) for the graphs to be updated. Thanks to Grafana (and few other parts of the pipeline discussed below) this is no longer the issue.</p>
+
+<p>But it you want to view your metrics over quite a long period of time, you may experience a slowdown since most of the work with generating graphs is done in your browser. But have no fear, making Grafana generate static PNG file is just a few clicks away!</p>
+
+<p>One thing to remember though - your dashboard won't be complete if you'll include only database-related graphs in it. To have a proper monitoring setup for you precious RDBMS, you should also have a clear view of system-level metrics like CPU usage (including I/O waits), system load, memory usage and of course disk-related statistics like I/O activity (both IOPS and latency), swap activity and usage, and disk space utilisation. You shouldn't also forget about network activity, sometimes it's also usefull to see hardware-level metrics like interrupts graphed over a period of time, though it may be less important if you're running your database in a virtualised environment, which happens suprisingly more often than most DBAs would like it.</p>
+
+<p>Another question worth answering before you start to work on your monitoring dash is what is most important to you in your setup or, to express the same idea in a bit different way, what breaks most often for you ;-) When you look at your dashboard, you want to know at first glance when something is wrong. That's why you need to think about the placement of your graphs so that the most important once will be clearly visible.</p>
+
+<h1 id="thepipeline">The pipeline</h1>
+
+<p>Grafana's just a part of modern graphing pipeline - it is responsible for visualising metrics, putting the graphs together into dashboards and it also provides a nice WebUI simplifying those tasks. </p>
+
+<p>But to be able to create graphs first you'll need data points. Usually a full stack graphing solution utilising Grafana consists also of <a href="https://github.com/graphite-project">Graphite</a> for transporting and storing metrics and <a href="http://collectd.org/">CollectD</a> for gathering them.</p>
+
+<p>While Graphite is quite a complex piece of software using few autonomous daemons, CollectD is very simple and fast. This allows having almost continuous data point collection with very small gaps of say 5 seconds between them. That's a huge difference to default Munin configuration mentioned above.</p>
+
+<p>A scalable setup of those components might look like that:</p>
+
+<pre><code>                                             &lt;==&gt;  collectd
+                       &lt;==&gt;  carbon-relay 1  &lt;==&gt;  collectd
+whisper  &lt;==&gt;  carbon                     
+                       &lt;==&gt;  carbon-relay n  &lt;==&gt;  collectd
+                                             &lt;==&gt;  collectd 
+</code></pre>
+
+<p>Each monitored hosts runs collectd that connects to one of carbon-relays (a part of Graphite suite); each relay relays received data to a central server where carbon (another part of Graphite suite) uses whisper (yet another one) to write collected metrics to files in an organised structure. It's also possible to have multiple instances of carbon and whisper running to provide even better scalability, HA and backup.</p>
+
+<p>I won't go into details about setting up the full pipeline since it's outside the scope of this article. Suffice to say that's a job for sysadmins and DBAs shouldn't really be concerned with anything else than configuring CollectD and creating graphs and dashboards. The rest of this article will cover just that.</p>
+
+<h1 id="thepractice">The practice</h1>
+
+<p>Some time ago I learned about a new "sport" - birdwatching. Well, I'd like to coin the notion of elephantwatching now ;-) Actually most of the kudos for this should go to Sebastian "tokkee" Harl since it was he who used the phrase "Watch your elephants" in his <a href="https://wiki.postgresql.org/images/b/bc/Pgconfeu12-collectd%2Bpsql.pdf">presentation</a> given at PgCong.EU at 2012 in Prague.</p>
+
+<p>So the goal is to have a comprehensive database statistics dashboard presenting the most important metrics in a clear and visible manner that can communicate in obvious way any problems that may happen. To achieve this goal we have to combine few of CollectD's plugins. First, we're gonna need to configure the basic ones like "cpu", "memory", "disk" or "df". This is really simple, in some cases - like "cpu" for example - all that you need to do is to <code>LoadPlugin</code>. And again, this can and should be handeled by your friendy sysadmin colleagues.</p>
+
+<p>But there are also some plugins that we can bend to fit our specific, database-oriented needs. Sebastian in his presentation gives a great example with "processes" plugin - we can use it to group processes and graph things like memory used by PostgreSQL's autovacuum workers, I/O utilised by background writers, CPU time used by statistics collectors and so on. This can complement system-level metrics, like general CPU or I/O activity in a very interesting way.</p>
+
+<p>And then there's <a href="https://collectd.org/documentation/manpages/collectd.conf.5.shtml#plugin_postgresql">postgresql CollectD plugin</a> with some nice set of default options including TPS, queries or I/O metrics available per cluster as well as per table.</p>
+
+<p>Using the predefined metrics can be fine, but with more active databases we usually want to collect also some custom ones from the totally awesome PostgreSQL <a href="http://www.postgresql.org/docs/current/static/monitoring-stats.html">statistics collector</a>. This is of course possible with this plugins - thanks to the <code>Query</code> block you can define a custom <code>Statement</code>, fetch it's results and store it as metric. One important thing to remember though - use the proper type, eg. counter or gauge; some of the metrics, like for example number of scans or tuples fetched, are always increasing while others, like number of connections, are the actual values. You may want to take a look at <a href="https://collectd.org/documentation/manpages/types.db.5.shtml">types.db</a> and grep it by <code>pg_</code>.</p>
+
+<p>When you're done, your dashboard might look somewhat like this:</p>
+
+<p><img src="http://rmw.vipserv.org/2015-12-03-131753_1680x1029_scrot.png" alt="pg dash" id="pgdash" /></p>
+
+<p>As you can see, Grafana gives a lot of freedom with visualising your data; you can choose between different graph types (line, area, stacked etc), you can present a single statistic as a number and you can also show a graph in it's background.</p>
+
+<p>Presenting single stats can be very useful in making your graph obvious when it comes to spotting problems. In my example you can see a single stat showing average cache hit ratio at the top of the image; it's green, but it'll turn red should the ratio drop below a defined threshold. Same can be done with other metrics like CPU usage, I/O wait, swap activity and so on.</p>
+
+<p>One another Grafana's great advantage over Munin is it's powerful query and transformation language. It's very easy to combine metrics together, correlate them, graph an average, sum etc.</p>
+
+<p>Let's take a look at how I created a CPU usage graph:</p>
+
+<p><img src="http://rmw.vipserv.org/2015-11-25-095721_1680x1029_scrot.png" alt="cpu graph" id="cpugraph" /></p>
+
+<p>As mentioned above, CollectD sends metrics to Graphite, Whisper then stores them in a hierachical structure. To make use of a metric in Grafana, you first have to find it in this structure. But it wouldn't be reasonable to create a new dashboard for every monitored server, right? That's why Grafana let's you use variables.</p>
+
+<p>If you take a look at the screenshot, you'll notice I defined 5 variables - each in a simple manner, a as part of CollectD "path", so <code>system_role</code> for example is defined as <code>collectd.*</code> and <code>environment</code> as <code>collectd.${system_role}.*</code>. Selectors for each variable are available at the top of your dashboard and this way your dash simply becomes reusable.</p>
+
+<p>In this particular graph there are two data series defined: <code>A</code> - named (using <code>alias()</code> function) <code>user+system</code> and <code>B</code> - <code>wait</code>. As you can see, I'm using <code>summarize()</code> function - this way the graph can be more smooth, that it would be when presenting all the data points. Actually, I should have used <code>avg</code> in <code>summarize()</code> instead of <code>sum</code>, I figured it out after capturing the screenshot. You can also see, that for series <code>A</code> I use <code>sumSeriesWithWildcard()</code> - this allows me to combine CPU time spent in userspace and in kernel - the function summarizes 8th node (0-based), so <code>{user,system}</code> in this case. Apart from that I'm doing average over all the system CPUs (nodes 6 and 7) and in the end - average over all the servers selected (you can select more than one).</p>
+
+<p>This is quite a simple use case, but there are much more functions to choose from.</p>
+
+<h1 id="theconclusion">The conclusion</h1>
+
+<p>I'd like to end this article with a note, that you should always remember, that graphing and alerting are two elements of monitoring that should go together.</p>
+
+<p>I hope this little tutorial will help you setting up your Grafana dash for PostgreSQL, but please do remember, that a good alertring solution should also be in place.</p>
+
+<p>Also, there are many other interesting projects out there to help with PostgreSQL monitoring, to name only few:</p>
+
+<ul>
+<li><p><a href="http://dalibo.github.io/pgbadger/">PgBadger</a> - a must-have log analyzer</p></li>
+<li><p><a href="http://dalibo.github.io/powa/">Powa</a> - real-time workload analyzer</p></li>
+<li><p><a href="http://www.postgresql.org/docs/current/static/pgstatstatements.html">pg_stat_statements</a> - PostgreSQL view tracking your queries</p></li>
+<li><p><a href="http://www.postgresql.org/docs/current/static/pgbuffercache.html">pg_buffercache</a> - another view tracking your shared_buffers</p></li>
+</ul>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

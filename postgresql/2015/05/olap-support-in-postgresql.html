@@ -1,0 +1,205 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>OLAP support in PostgreSQL &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/postgresql/2015/05/olap-support-in-postgresql.html">OLAP support in PostgreSQL</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2015-05-29T16:37:00 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/postgresql/2015/05/olap-support-in-postgresql.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>I was recently a key resource involved in migrating OLAP<a href="#fn:olap" id="fnref:olap" class="footnote">1</a> cubes from proprietary software to FLOSS<a href="#fn:floss" id="fnref:floss" class="footnote">2</a> setup utilizing PostgreSQL and <a href="http://community.pentaho.com/">Pentaho BI</a>. I learned that OLAP isn't really a PostgreSQL domain but getting basic support for analytical queries will definitely make many tasks easier.</p>
+
+<p>There are two main use cases for databases - one can either perform online transaction processing or online analytical processing. The main difference between the two is that while OLTP<a href="#fn:oltp" id="fnref:oltp" class="footnote">3</a> uses a lot of relatively simple read and write operations and depends on ACID<a href="#fn:acid" id="fnref:acid" class="footnote">4</a>/MVCC<a href="#fn:mvcc" id="fnref:mvcc" class="footnote">5</a>, OLAP does a lot of complicated and very heavy read operations and isn't really that concerned with concurrency issues.</p>
+
+<p>Other difference is that OLTP uses the traditional, two-dimensional relational model where you have tables and relations between them while OLAP analysis is done in multi-dimensional cubes. Imagine a <em>products</em> table; a product's price is determined by two factors - <em>productid</em> (row) and <em>price</em> (column). So the price is an intersection of two dimensions. Now imagine your business runs across borders, so the price is determined by more, than two factors - <em>productid</em>, <em>price</em> and <em>currency</em> - for one and the same product a price can be different in GBP and EUR. So the price is an intersection of the three. But the price of the same product in the same currency can differ based on the country - the same product can cost X EUR in, let's say, Germany, and Y EUR in, let's say, Ireland. So there can be even more, than 3 factors. So in OLAP these factors are called <em>dimensions</em> and what's on the intersections of all the dimensions is called <em>measures</em>.</p>
+
+<p>During my adventure with moving the cubes my tool stack was quite simple; I used only PostgreSQL as the ROLAP<a href="#fn:rolap" id="fnref:rolap" class="footnote">6</a> storage and Pentaho BI as the engine to access it via MDX<a href="#fn:mdx" id="fnref:mdx" class="footnote">7</a> queries. It was working fine, but it was slow. Why is that?</p>
+
+<p>Well, you might have noticed a new term. ROLAP differs from MOLAP<a href="#fn:molap" id="fnref:molap" class="footnote">8</a> in a very significant way. While MOLAP systems tend to store pre-calculated values in pre-aggregated tables and have their data files optimised for fast data access ROLAP systems depend on live SQL queries to fetch, calculate and aggregate what the user wants. This imposes a serious overhead and makes working with cubes a lot harder than with cubes stored in MOLAP systems.</p>
+
+<p>It is worth mentioning though, that ROLAP has some advantages over MOLAP; there's a quite good <a href="http://en.wikipedia.org/wiki/ROLAP#Advantages_of_ROLAP">section</a> on this in Wikipedia's <a href="http://en.wikipedia.org/wiki/ROLAP">article</a>. One is that you can actually setup your OLAP schema with a relational DB's schema, so you can have your facts in one table, dimensions in other tables and use foreign keys to link them together. You can arrange your tables in either a snowflake<a href="#fn:snowflake" id="fnref:snowflake" class="footnote">9</a> or star<a href="#fn:star" id="fnref:star" class="footnote">10</a> schema.</p>
+
+<p>So to run a ROLAP system in a way allowing good user experience you really need aggregate tables. Without them all the calculations and aggregations are done live, and with large data sets it's jut not acceptable. But creating aggregate tables is really tedious, especially if you have a lot of dimensions. You have to create aggregate tables for each and every combination of dimensions that a user might want to use. Of course you have to repeat the process so your cube is up to date. </p>
+
+<p>Technically to implement aggregate tables I decided to use materialized views<a href="#fn:mv" id="fnref:mv" class="footnote">11</a>. It's a pretty obvious choice and Pentaho allows use of them (though I had to create a <a href="https://github.com/rmwpl/mondrian/commit/f20a03be232794509ceb164a21deabc2e14f3f85">little patch</a>). Basically you declare your matviews in the OLAP schema file and the engine will consider them while running users' queries. Great tool, really. <br />
+But creating the views demanded a lot of manual work and also a lot of computation time. Each <code>CREATE MATERIALIZED VIEW</code> and <code>REFRESH MATERIALIZED VIEW</code> required a sequential table scan for quite a large fact table and many other, sometimes also large, dimension tables. <br />
+This made my cube refresh process quite lengthy.</p>
+
+<p>With the recent addition to PostgreSQL the task of creating aggregate tables becomes easy. Thanks to <code>GROUPING SETS</code>, <code>ROLLUP</code> and <code>CUBE</code> it is possible not only to create a set of aggregates in one go, but more important, using only one sequential scan. <br />
+This is really important functionality and has the potential to make a huge difference while using PostgreSQL as ROLAP storage. From what it looks it shouldn't cause any trouble to Pentaho to use materialized views created with the new keywords, but I haven't tested it.</p>
+
+<p>If you want to know more about how the new features work, you can visit <a href="http://www.depesz.com/">Depesz</a>, who did a great <a href="http://www.depesz.com/2015/05/24/waiting-for-9-5-support-grouping-sets-cube-and-rollup/">writeup</a> on this.</p>
+
+<p>While working on the task of moving cubes to FLOSS-powered solution I found, that MOLAP systems are much faster in giving the end user what she wants. Actually, the consensus in the community seems to be the same. That's why the <a href="http://git.postgresql.org/pg/commitdiff/f3d3118532175541a9a96ed78881a3b04a057128">patch</a> is a big deal. <br />
+One thing to remember though. This isn't everything you need to have OLAP, since PostgreSQL won't process your MDX queries. Pentaho BI is another piece of the puzzle.</p>
+
+<div class="footnotes">
+<hr />
+<ol>
+
+<li id="fn:olap"><p>On-Line Analytical Processing<a href="#fnref:olap" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:floss"><p>Free/Libre/OpenSource Software<a href="#fnref:floss" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:oltp"><p>On-Line Transaction Processing<a href="#fnref:oltp" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:acid"><p>Atomicity, Consistency, Isolation, Durability - a set of rules guaranteeing reliable processing of database transactions<a href="#fnref:acid" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:mvcc"><p>MultiVersion Concurrency Control - concurrency control model allowing database transactions to see a consistent and stable database snapshot<a href="#fnref:mvcc" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:rolap"><p>Relational OLAP - a way of accessing OLAP entities through a RDBMS<a href="#fnref:rolap" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:mdx"><p>MultiDimensional eXpressions - a query language similar to SQL used to access OLAP data<a href="#fnref:mdx" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:molap"><p>Multidimensional OLAP - an OLAP data store using OLAP-optimised storage techniques<a href="#fnref:molap" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:snowflake"><p>in a snowflake schema a fact table is connected with many dimension tables which in turn are connected with other dimension tables allowing dimensions to be normalized even for a multi-level dimensions<a href="#fnref:snowflake" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:star"><p>a star schema is a special case of snowflake schema where every dimension is represented by one table even if the dimensions has multiple levels<a href="#fnref:star" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:mv"><p>materialized view is a physical representation of the data returned by the view's underlying query, it has to be refreshed periodicaly<a href="#fnref:mv" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+</ol>
+</div>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

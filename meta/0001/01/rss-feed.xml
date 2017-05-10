@@ -1,0 +1,79 @@
+<rss version="2.0">
+  <channel>
+    <title>Travelling SysOp</title>
+    <link>http://travellingsysop.net/</link>
+    <description>Robert M. Wysocki on PostgreSQL and GNU/Linux</description>
+    <lastBuildDate>Thu, 25 Aug 2016 19:08:29 BST</lastBuildDate>
+    <generator>dapper</generator>
+    <item>
+      <title><![CDATA[ Say hello to Database DevOps Engineer ]]></title>
+      <link>http://travellingsysop.net/postgresql/2016/08/say-hello-to-database-devops-engineer.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>The Database Administrator is going away for sure. The old-school person with magical SQL abilities and knowing all the caveats there are to know about RDBMSs is doomed in the era of "multipurpose" developers. The "DBA as in Database Advocate" idea carries an important weight, but I feel we should augment the notion a bit.</p> ]]></description>
+      <pubDate>Fri, 12 Aug 2016 17:27:00 BST</pubDate>
+    </item>
+    <item>
+      <title><![CDATA[ Backing up PostgreSQL ]]></title>
+      <link>http://travellingsysop.net/postgresql/2016/06/backing-up-postgresql.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>You know this good ol' IT saying: "There are two types of people: those how back up their data and those how are yet to start" Backing up databases is especially important since they usually contain information critical not only to day-to-day business operation, but also for business continuity. People leave, software fails, world changes. What remain is your data and if you have it, you can always start from the scratch - with new software, new people, in new world. Let's have a look at various backups strategies available for PostgreSQL databases so that we can prepare for the worst.</p> ]]></description>
+      <pubDate>Wed, 29 Jun 2016 07:00:00 BST</pubDate>
+    </item>
+    <item>
+      <title><![CDATA[ Bloat: origins, monitoring and managing ]]></title>
+      <link>http://travellingsysop.net/postgresql/2016/03/bloat-origins-monitoring-and-managing.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>PostgreSQL's <a href="http://www.postgresql.org/docs/current/static/mvcc.html">MVCC model</a> provides excellent support for running multiple transactions operating on the same data set. One natural consequence of its design is the existence of so-called "database bloat". Judging by the amount of questions raised in the Internet it is quite a common problem and not many people seem to know, how to properly deal with it. I myself had the same issues and learnt one or two things that might be helpful, so in this article I'd like to shed some light on this notion - why it's there in the first place, how it can affect performance and finally how to monitor and manage it.</p> ]]></description>
+      <pubDate>Sun, 13 Mar 2016 14:20:00 GMT</pubDate>
+    </item>
+    <item>
+      <title><![CDATA[ Elephant-watching ]]></title>
+      <link>http://travellingsysop.net/postgresql/2016/01/elephant-watching.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>Proper monitoring is the key to keeping your system in good health and it's especially important in the database field. No matter if you have a busy systems processing a lot of transactions each second or you just want to keep tabs on your data warehouse handeling only few heavy queries - you want to graph most of the metrics in order to be able to see, how they're trending. There are many solutions for doing that, but let me tell you a secret - in this endeavour <a href="http://grafana.org/">Grafana</a> will be your best friend.</p> ]]></description>
+      <pubDate>Sun, 10 Jan 2016 20:38:55 GMT</pubDate>
+    </item>
+    <item>
+      <title><![CDATA[ It's a view, it's a table... no, it's a materialized view! ]]></title>
+      <link>http://travellingsysop.net/postgresql/2015/11/its-a-view-its-a-table-no-its-a-materialized-view.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>Databases come in different shapes and sizes and so do policies created by their administrators. One of the strictest and most original is the rule I came across recently: "No VIEWs allowed in production database". When tracking down slow queries and investigating their causes, VIEWs can make the task much harder. And even more complicated is the issue of ownership and responsiblity, especially when things take a wrong turn because of too many or too complex VIEWs. But usually the solution is simple and there's no need to go to such extremes as the rule mentioned. In this case it can be as easy as implementing MATERIALIZED VIEWs.</p> ]]></description>
+      <pubDate>Tue, 24 Nov 2015 14:24:00 GMT</pubDate>
+    </item>
+    <item>
+      <title><![CDATA[ Common misconceptions about locking in PostgreSQL ]]></title>
+      <link>http://travellingsysop.net/postgresql/2015/10/common-misconceptions-about-locking-in-postgresql.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>At the core of any good database is a great locking mechanism to ensure that data is quickly, safely and consistently updated. In my work as a DBA though, I've come across many misconceptions about locking and even some senior developers I talked with were unclear as to the internal workings of PostgreSQL. Understanding some of the concepts should go a long way in helping to create faster and more responsive applications.</p> ]]></description>
+      <pubDate>Sat, 17 Oct 2015 16:13:28 BST</pubDate>
+    </item>
+    <item>
+      <title><![CDATA[ Pentaho adventure ]]></title>
+      <link>http://travellingsysop.net/postgresql/2015/07/pentaho-adventure.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>I've been asked some time ago by a colleague to tell something more about my adventure with Pentaho and how did I make it play nice with PostgreSQL. So here it goes, here's my story.</p> ]]></description>
+      <pubDate>Sat, 11 Jul 2015 10:36:00 BST</pubDate>
+    </item>
+    <item>
+      <title><![CDATA[ OLAP support in PostgreSQL ]]></title>
+      <link>http://travellingsysop.net/postgresql/2015/05/olap-support-in-postgresql.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>I was recently a key resource involved in migrating OLAP<a href="#fn:olap" id="fnref:olap" class="footnote">1</a> cubes from proprietary software to FLOSS<a href="#fn:floss" id="fnref:floss" class="footnote">2</a> setup utilizing PostgreSQL and <a href="http://community.pentaho.com/">Pentaho BI</a>. I learned that OLAP isn't really a PostgreSQL domain but getting basic support for analytical queries will definitely make many tasks easier.</p> ]]></description>
+      <pubDate>Fri, 29 May 2015 16:37:00 BST</pubDate>
+    </item>
+    <item>
+      <title><![CDATA[ Replication in PostgreSQL - basics ]]></title>
+      <link>http://travellingsysop.net/postgresql/2015/05/replication-in-postgresql-basics.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>People familiar with MySQL are usually a bit confused with how replication is done in PostgreSQL. This is due to the fact that there are many ways to do this depending on what you want to achieve.</p> ]]></description>
+      <pubDate>Tue, 19 May 2015 15:21:00 BST</pubDate>
+    </item>
+    <item>
+      <title><![CDATA[ Basic control over query planner ]]></title>
+      <link>http://travellingsysop.net/postgresql/2015/05/basic-control-over-query-planner.html</link>
+      <category><![CDATA[ postgresql ]]></category>
+      <description><![CDATA[ <p>PostgreSQL's query planner is great. There's no doubt about it (at least in the community). But query planning sometimes goes wrong.</p> ]]></description>
+      <pubDate>Sun, 17 May 2015 18:35:00 BST</pubDate>
+    </item>
+  </channel>
+</rss>

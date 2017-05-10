@@ -1,0 +1,356 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>It's a view, it's a table... no, it's a materialized view! &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/postgresql/2015/11/its-a-view-its-a-table-no-its-a-materialized-view.html">It's a view, it's a table... no, it's a materialized view!</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2015-11-24T14:24:00 GMT &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/postgresql/2015/11/its-a-view-its-a-table-no-its-a-materialized-view.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>Databases come in different shapes and sizes and so do policies created by their administrators. One of the strictest and most original is the rule I came across recently: "No VIEWs allowed in production database". When tracking down slow queries and investigating their causes, VIEWs can make the task much harder. And even more complicated is the issue of ownership and responsiblity, especially when things take a wrong turn because of too many or too complex VIEWs. But usually the solution is simple and there's no need to go to such extremes as the rule mentioned. In this case it can be as easy as implementing MATERIALIZED VIEWs.</p>
+
+<p><em>This article was <a href="https://www.compose.io/articles/its-a-view-its-a-table-no-its-a-materialized-view/">published</a> by <a href="https://www.compose.io">compose.io</a> as a part of <a href="https://www.compose.io/write-stuff/">Write Stuff</a> programme. Unlike other articles on my blog, this one is licensed under the terms of CC BY-NC-SA 4.0</em></p>
+
+<p>When dealing with slow queries, one of the first things that come to mind is query result caching. This can be especially important in complex architectures with many VIEWs over other VIEWs over yet another set of VIEWs. With lengthy SELECT queries operating on stacks like this, it's often hard to say whether the query planner will push the predicates down. If it won't - you're in deep trouble.</p>
+
+<p>I can understand the policy of "no VIEWs allowed". It's simply because in the past I did come across heavy queries utilising VIEWs more than once. The main problem is that if for some reason your predicates won't get pushed down into the VIEWs definition, you'll end up with fetching all the rows the VIEW in question would fetch without the predicate and then filtering them. That's quite a penalty and you probably wouldn't use the VIEW in the first place if you'd know about that.</p>
+
+<p>In my experience, often when faced with similar cases, application developers tend to try and "solve" the problem themselves by implementing some sort of application-level result caching. But what if you would have an easy way of caching results of your views, a way that wouldn't raise the need to involve external tools such as <code>memcached</code> or <code>redis</code>?</p>
+
+<h1 id="terminology">Terminology</h1>
+
+<p>But maybe it's best to first get our terminology straight. What is a VIEW? And how MATERIALIZED VIEW is related to VIEW?</p>
+
+<p>Let's start with TABLE - it's basically an organised storage for your data - columns and rows. You can easily query the TABLE using predicates on the columns. To simplify your queries or maybe to apply different security mechanisms on data being accessed you can use VIEWs - named queries - think of them as glasses through which you can look at your data.</p>
+
+<p>So if TABLE is a storage, a VIEW is just a way of looking at it, a projection of the storage you might say. When you query a TABLE, you fetch it's data directly. On the other hand, when you query a VIEW, you basically query another query that is stored in the VIEW's definition. But the query planner is aware of that and can (and usually does) apply some "magic" to merge the two together.</p>
+
+<p>Between the two there is MATERIALIZED VIEW - it's a VIEW that has a query in it's definition and uses this query to fetch the data directly from the storage, but it also has it's own storage that basically acts as a cache in between the underlying TABLE(s) and the queries operating on the MATERIALIZED VIEW. It can be refreshed, just like an invalidated cache - a process that would cause it's definition's query to be executed again against the actual data. It can also be truncated, but then it wouldn't behave like a TABLE nor a VIEW. It's worth noting that this dual nature has some interesting consequences; not like simple "nominal" VIEWs their MATERIALIZED cousins are "real" meaning you can for example create indices on them, but on the other hand you should also take care of removing bloat from them.<a href="#fn:otacoo" id="fnref:otacoo" class="footnote">1</a></p>
+
+<h1 id="simpleusecase">Simple use case</h1>
+
+<p>Now that we have our notions sorted out and we know what we're talking about, let's take a quick look at a trivial example - so I have this really simple database that I use to store investment fund quotes:</p>
+
+<pre><code>fundusze=# \d names
+            Table "public.names"
+ Column |          Type          | Modifiers 
+--------+------------------------+-----------
+ symbol | character(6)           | not null
+ name   | character varying(128) | 
+Indexes:
+    "names_pkey" PRIMARY KEY, btree (symbol)
+Referenced by:
+    TABLE "costs" CONSTRAINT "costs_symbol_fkey" FOREIGN KEY (symbol) REFERENCES names(symbol)
+    TABLE "funds" CONSTRAINT "funds_symbol_fkey" FOREIGN KEY (symbol) REFERENCES names(symbol)
+    TABLE "quotes" CONSTRAINT "quotes_symbol_fkey" FOREIGN KEY (symbol) REFERENCES names(symbol)
+
+fundusze=# \d quotes
+       Table "public.quotes"
+ Column |     Type     | Modifiers 
+--------+--------------+-----------
+ symbol | character(6) | not null
+ date   | date         | not null
+ quote  | numeric(6,2) | 
+Indexes:
+    "quotes_pkey" PRIMARY KEY, btree (symbol, date)
+Foreign-key constraints:
+    "quotes_symbol_fkey" FOREIGN KEY (symbol) REFERENCES names(symbol)
+</code></pre>
+
+<p>If I'd like to fetch quotes for all equity (<em>akcji</em> in Polish) funds, I would have to execute a query like this:</p>
+
+<pre><code>fundusze=# explain (buffers, analyze) select date, quote from quotes inner join names on quotes.symbol = names.symbol where names.name ilike '%akcji%';
+                                                      QUERY PLAN                                                      
+----------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=8.06..3828.04 rows=37921 width=10) (actual time=0.524..574.040 rows=25944 loops=1)
+   Hash Cond: (quotes.symbol = names.symbol)
+   Buffers: shared hit=9 read=1088 dirtied=281
+   -&gt;  Seq Scan on quotes  (cost=0.00..2799.65 rows=170965 width=17) (actual time=0.008..539.779 rows=135480 loops=1)
+         Buffers: shared hit=2 read=1088 dirtied=281
+   -&gt;  Hash  (cost=7.33..7.33 rows=59 width=7) (actual time=0.469..0.469 rows=47 loops=1)
+         Buckets: 1024  Batches: 1  Memory Usage: 2kB
+         Buffers: shared hit=4
+         -&gt;  Seq Scan on names  (cost=0.00..7.33 rows=59 width=7) (actual time=0.030..0.454 rows=47 loops=1)
+               Filter: ((name)::text ~~* '%akcji%'::text)
+               Rows Removed by Filter: 219
+               Buffers: shared hit=4
+ Planning time: 147.585 ms
+ Execution time: 575.966 ms
+(14 rows)
+</code></pre>
+
+<p>It isn't that fast for such a small table, but it's the first run, so most of the rows were read from disk. I can use a VIEW to simplify the query:</p>
+
+<pre><code>fundusze=# create view quotes_akcji_v as select date, quote from quotes inner join names on quotes.symbol = names.symbol where names.name ilike '%akcji%';
+CREATE VIEW
+fundusze=# explain (buffers, analyze) select * from quotes_akcji_v ;
+                                                     QUERY PLAN                                                      
+---------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=8.06..3828.04 rows=37921 width=10) (actual time=1.004..54.585 rows=25944 loops=1)
+   Hash Cond: (quotes.symbol = names.symbol)
+   Buffers: shared hit=1094
+   -&gt;  Seq Scan on quotes  (cost=0.00..2799.65 rows=170965 width=17) (actual time=0.013..19.185 rows=135480 loops=1)
+         Buffers: shared hit=1090
+   -&gt;  Hash  (cost=7.33..7.33 rows=59 width=7) (actual time=0.972..0.972 rows=47 loops=1)
+         Buckets: 1024  Batches: 1  Memory Usage: 2kB
+         Buffers: shared hit=4
+         -&gt;  Seq Scan on names  (cost=0.00..7.33 rows=59 width=7) (actual time=0.043..0.940 rows=47 loops=1)
+               Filter: ((name)::text ~~* '%akcji%'::text)
+               Rows Removed by Filter: 219
+               Buffers: shared hit=4
+ Planning time: 0.938 ms
+ Execution time: 56.539 ms
+(14 rows)
+</code></pre>
+
+<p>As you can see, it's much faster now, but it has nothing to do with the fact that I used a VIEW - it's simply because this time all the rows were fetched from the shared buffers cache. The timings would look more or less the same should I've used the same direct query again.</p>
+
+<p>Based on the VIEW created I can now show you it's MATERIALIZED version:</p>
+
+<pre><code>fundusze=# create materialized view quotes_akcji_mv as select * from quotes_akcji_v ;
+SELECT 25944
+fundusze=# explain (buffers, analyze) select * from quotes_akcji_mv ;
+                                                     QUERY PLAN                                                     
+--------------------------------------------------------------------------------------------------------------------
+ Seq Scan on quotes_akcji_mv  (cost=0.00..380.70 rows=23970 width=18) (actual time=0.038..9.311 rows=25944 loops=1)
+   Buffers: shared hit=141 dirtied=141
+ Planning time: 0.129 ms
+ Execution time: 13.137 ms
+(4 rows)
+</code></pre>
+
+<p>So here you can see, that upon creation a SELECT query was executed fetching the data from <code>quotes_akcji_v</code>; the rows fetched were then stored in <code>quotes_akcji_mv</code> MATERIALIZED VIEW's storage. As a result, querying the MATERIALIZED VIEW is 4 times faster, than querying VIEW. If you'll take a look at both query plans, you'll notice, that VIEW query has to apply a filter on all the rows while MATERIALIZED version just fetches all the rows, since filtering has already been done upon creation.</p>
+
+<h1 id="abitmorecomplexusecase">A bit more complex use case</h1>
+
+<p>Now the previous example was a very simple one with an extremely small data set and yet you can see that the benefit of creating and using MATERIALIZED VIEW in place of a plain VIEW was significant. Just imagine, how much can be gained in more complex cases. Actually, you don't have to imagine anything, let me tell you a story.</p>
+
+<p>We had quite a big table with keyword hits. Throughout the whole day, a process had to go through another database, do some calculations and then update our table in question. This was quite a lengthy procedure. Another process had to periodically go throught the table to... well... process it. The problem was that a quite complex query (involving not only this one table but also few smaller ones) was taking too long to run - think hours. And once it finished - it had to start over with the new data. One important fact - the application used a CURSOR to fetch data in batches. What happened to us more than once was that those two processes were blocking each other - we couldn't put fresh data in the table because processing was still running (having an open CURSOR to the table). And before the processing finished we already had one or more refresh processes queued up to access the table.</p>
+
+<p>In order to speed things up, we decided to create a MATERIALIZED VIEW over the query. The update process was able to go through the table without being locked out by frontend queries and the web application was allowed to have a CURSOR open to MATVIEW for as long as it needed. The result was more than satisfying - not only the two stopped blocking each other, but also the execution time went down from hours to minutes.</p>
+
+<p>But soon we were faced with another interesting problem. Obviously, we had to REFRESH the MATVIEW from time to time. The thing is that during such a refresh MATERIALIZED VIEW in unavailable for querying - an <code>AcessExclusiveLock</code> is acquired by the REFRESH query. Refreshing was heavy and needed some time to complete, so the frontend queries were piling up waiting for the MATVIEW to become available again. Unfortunately, we still had few months till the release of PostgreSQL 9.4 and the totally awesome feature called REFRESH MATVIEW CONCURRENTLY. I've read about it many times and was really looking forward to it, but we had a real problem that demanded a solution.</p>
+
+<p>Let's stop for a moment. Let me explain, why I was so excited about this new feature. The magic CONCURRENTLY word means that the MATVIEW is available for querying during REFRESH procedure. What it does under the hood is that it creates a new MATVIEW with a fresh data set and then compares the two and applies changes to the original one on a row-by-row basis - so it doesn't require a heavy, exclusive lock on the original MATVIEW. An interesting piece of information that I just learned while doing research for this article is that comparing and applying changes is done thanks to <a href="https://wiki.postgresql.org/images/a/ad/Materialised_views_now_and_the_future-pgconfeu_2013.pdf">FULL OUTER JOIN</a>. One important thing to remember - in order to be able to compare the two, PostgreSQL needs the MATVIEW to have an UNIQUE INDEX.</p>
+
+<p>So we had a MATERIALIZED VIEW speeding up our queries. They were faster than run without the MATVIEW, but still taking some time. Queries were using CURSORs to process data in batches and it was opened throughout the query's duration. The window between one CURSOR being closed and another being opened was moving, so there was no real way of synchronising the two. We needed a way to wait for one query to finish, REFRESH the MATVIEW and make it accessible for another query. But we couldn't lock the MATVIEW out for a long period of time needed to REFRESH it since our queries would start piling up.</p>
+
+<p>We came up with an idea about using two MATVIEWs - primary and standby - and having a stored procedure do REFRESH of one and then a swap between them - all in one transaction. Thanks to architecure like this we could hold a lock on the "primary" view only for a very short period of time needed to rename the "secondary" to "primary". The other one being locked for a long time wouldn't harm us. But this wasn't perfect. Still we didn't know, when to exactly schedule the run since we didn't have a way to anticipate, when one query will finish and the other will start (courtesy of asynchronous job queue). So our procedure would end up with a refreshed "standby" MATVIEW that couldn't be renamed to "primary". Actually, it was a little more complicated. After refreshing "standby" we had to rename "primary" to "tmp" and just then we could rename "standby" to "primary". We could just run ALTER MATVIEW primary RENAME TO tmp and wait for it to finish, but...</p>
+
+<p>There's a lot of "but's" in this story, I know, but that's way it's so full of lessons learned.</p>
+
+<p>So letting ALTER wait and run wouldn't really work for us. That's for a very simple reason - ALTER statement would place an <code>AccessExclusiveLock</code> on the MATVIEW in question in the lock queue causing application queries to pile up <a href="https://www.compose.io/articles/common-misconceptions-about-locking-in-postgresql/">waiting for their turn</a> We didn't want that to happen since this was the problem we were trying to solve in the first place.</p>
+
+<p>One of the things we thought about was to have a flag in the application telling it, which MATVIEW is available for querying at any time. But this would be hard to implement mainly due to the use of an ORM.</p>
+
+<p>If we only had a way of waiting for a lock without placing a long-lasting lock ourselves... Come on, we're using The Most Advanced Open Source Database in The World, sure there's a way of doing what we need!</p>
+
+<p>What we needed was to: <br />
+1. REFRESH a "standby" MATVIEW trying multiple times if necessary <br />
+2. rename "primary" to "tmp" in one quick go, without long-lasting locks, also trying multiple times if necessary <br />
+3. rename "standby" to "primary" <br />
+So I did some modifications to the first draft of the stored procedure.</p>
+
+<p>First of all I had to find a way to timeout a query in the event of it not being able to acquire a lock. A quick research was enough to find the <a href="http://www.postgresql.org/docs/current/static/runtime-config-client.html#GUC-LOCK-TIMEOUT"><code>lock_timeout</code> GUC</a> - a great setting allowing to specify exactly this - a maximum time a query can wait for a lock before timing out. But this wasn't enough.</p>
+
+<p>Second thing was retrying failed operations. Obviously I didn't want the whole procedure to fail if it couldn't acquire a lock - I wanted it to try for a couple of times before exiting with an error. This was quite easy and I decided to use a simple loop with a fixed number of iterations.</p>
+
+<p>The last element was not to try again immediately, but after some small, random delay. A combination of <code>pg_sleep()</code> and <code>random()</code> was exactly, what I needed.</p>
+
+<p>So I had all the pieces ready, I just had to put them together. In pseudo-code, I came up with something along the lines of: <br />
+0. set <code>lock_timeout</code> and max iterations variable <br />
+1. start the loop <br />
+2. try and refresh the "standby" MATVIEW <br />
+3. if timed out, start another iteration, fail after reaching max iterations count <br />
+4. if successful, start fresh loop <br />
+5. try and rename "primary" to "tmp" <br />
+6. if timed out, start another iteration, fail after reaching max iterations count <br />
+7. if successful, rename "standby" to "primary" <br />
+8. rename "tmp" to "standby"</p>
+
+<p>There are two loops in order to try and acquire two locks on two MATVIEWs. You can see that the last two RENAME operations aren't contained in such loops. It is simply because all is done in one transaction and this means that after successful step 6. this transations already holds an <code>AccessExclusiveLock</code> on both the MATVIEWs, so we can be sure, that following steps will be executed without any delays.</p>
+
+<p>This solution worked perfectly for us and with a big enough max iterations count we didn't have to worry about synchronisation anymore. Writing this was fun and exciting for me, so I leave coming up with an actual PLPgSQL code as a homework for the reader. I hope it'll prove to be a good exercise for you!</p>
+
+<h1 id="otherscenarios">Other scenarios</h1>
+
+<p>Aggregates, joins, very large tables with huge amounts of data and numer of columns and queries with possibly many predicates - with all of these MATERIALIZED VIEWs can help and their uses are not limited to OLTP databases. In fact, <a href="http://travellingsysop.net/postgresql/2015/05/olap-support-in-postgresql.html">OLAP</a> is another paradigm in which MATVIEWs can be extremely useful. Crunching numbers while also fetching data can take some time, and users usually expect their reports and cubes to be fast. Good schema design is important, but if data freshness isn't the major concern, using MATERIALIZED VIEWs can speed things up greatly.</p>
+
+<p>Another use case is simply keeping data in sync. If you have for example many dimension tables that are often updated, you may end up with inconsitent reports when running an "old" fact table against a "newer" dimension table. MATERIALIZED VIEW can keep all of those in sync by using a single, consistent snapshot while refreshing.</p>
+
+<h1 id="manystrategies">Many strategies</h1>
+
+<p>But the notion of MATERIALIZED VIEW has been around much longer, than this particular implementation. Few years back I had to opportunity to learn about different strategies that aren't covered yet by the core of PostgreSQL: "lazy" and "eager". Both use triggers, so can be implemented in older PostgreSQL versions.</p>
+
+<p>"Lazy" MATERIALIZED VIEWs work by storing identifiers of modified rows in a separate table and then, when it's time to refresh, reading that table and applying changes to the target one. They're called "lazy", since you have to explicitly "tell" the database, when to refresh target table's contents.</p>
+
+<p>Another strategy is "eager" one, which modifies the MATERIALIZED VIEW right after the source data is modified. It also utilises triggers, but instead of using an intermediate table to store row identifiers it executes and UPDATE, INSERT or DELETE statements directly on the MATERIALIZED VIEW's table.</p>
+
+<p>There's a <a href="http://hashrocket.com/blog/posts/materialized-view-strategies-using-postgresql">great article</a> by Jack Christensen about those strategies. Another good source of information is <a href="http://tech.jonathangardner.net/wiki/PostgreSQL/Materialized_Views">a wiki page</a> on pre 9.3 strategies.</p>
+
+<h1 id="future">Future</h1>
+
+<p>What awaits in the future? Well, one interesting thing would be actually applying the strategies mentioned above to native PostgreSQL MATERIALIZED VIEWs. Among them, one proposed is a "very eager" refresh strategy causing the MATVIEW to be updated along side the original modifying query, even before the transaction commits. Other things include an ability to create UNLOGGED MATERIALIZED VIEWs and making the query optimiser aware of MATVIEWs. The former would be very useful in high-traffic replicated databases, where the number and size of generated WAL segments matters. The latter would make PostgreSQL treat MATVIEWs as indices and give it the ability to pull the data from them is deemd fresh enough.<a href="#fn:pgconf" id="fnref:pgconf" class="footnote">2</a></p>
+
+<h1 id="summary">Summary</h1>
+
+<p>PostgreSQL's native MATERIALIZED VIEWs are a powerful tool enabling many performance improvements and giving another way of ensuring data consitency. It's even more powerful with the ability to REFRESH CONCURRENTLY and provided a certain level of procedural language knowledge one can achieve many interesting results going beyond the native implementation.</p>
+
+<p>With many proposed changes and so much ideas floating around the Web, it's certainly a good idea to keep a close eye on the developments being made and solutions being created.</p>
+
+<p>I sincerely hope my article was helpful and could be considered as such a information source on understanding and using PostgreSQL's MATERIALIZED VIEWs.</p>
+
+<p>Thank you for reading!</p>
+
+<div class="footnotes">
+<hr />
+<ol>
+
+<li id="fn:otacoo"><p>http://michael.otacoo.com/postgresql-2/postgres-9-3-feature-highlight-materialized-views/<a href="#fnref:otacoo" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:pgconf"><p>https://wiki.postgresql.org/images/a/ad/Materialised_views_now_and_the_future-pgconfeu_2013.pdf<a href="#fnref:pgconf" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+</ol>
+</div>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

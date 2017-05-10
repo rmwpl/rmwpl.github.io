@@ -1,0 +1,202 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>What's wrong with Agile Operations? &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/gnu-linux/2016/06/whats-wrong-with-agile-operations.html">What's wrong with Agile Operations?</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2016-06-22T18:50:00 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/gnu-linux/2016/06/whats-wrong-with-agile-operations.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>Time flies. It's been almost a year since I've published my <a href="https://www.linkedin.com/pulse/whats-wrong-devops-robert-m-wysocki">What's wrong with DevOps?</a> article. The attention it received came as quite a surprise to me. It seems that there is a number of like-minded individuals sharing my point of view. But what came as even more of a shock was that these individuals also seem to like my writing style. Awesome. No pressure then. </p>
+
+<p>But truly, I've been wanting to write a follow-up for some time now. Finally got to do that. For better or for worse; I leave figuring this out to you.</p>
+
+<p>One of the topics closely related to the "DevOps" buzzword (or even brought to daylight by its viral spread) is Agile Operations.</p>
+
+<p>We all know that in nowadays business "agility is the key". There are so many wonderful acronyms, contractions and neologisms like MVP, NoOps, CI, CD, pipeline, XP, serverless, SOA, TDD, API, TL;DR and so on that one could write up a tech article consisting just of them! But what that means to "hard IT" folk like us, "the ops guys"?</p>
+
+<p>With the rise of Agile software development methodologies, developers and companies started releasing apps much faster, than they used to. Iterative approach towards creating code had to -- sooner or later -- revolutionise delivering this code to systems it would run on. Continuous integration and continuous delivery are two concepts that probably most of operations people are familiar with. While automating the "delivery pipe" completely may be frightening at first, it's functional not only for Devs, but also for Ops. Being able to deploy faster means being able to fix problems faster. For example by rolling back to a known-working application version.</p>
+
+<p>Both CI and CD are, in my personal opinion, on the "bright" side of Agile Operations. I've done some automation work with Jenkins and Drone myself and loved the results I've achieved. What's even more important than agility, is the communication and collaboration improvement that CI and CD bring to the table: from the <a href="http://venturebeat.com/2013/04/06/agile-devops/">shared visibility</a> of the test and deployment success rates to the clarity around delivery process to a single control console of the process itself.</p>
+
+<p>But there's more to Agile Operations than just Agile Delivery.</p>
+
+<p>The "Agile" in "Agile Operations" implies we should use some sort of agile methodology. Scrum is probably the most well known one and it's used by countless Dev team across the globe. Probably with some success, since we still read about it. But in the Ops world we don't have only structured project work. Actually, most of the work we do (and it really doesn't matter, if we're called "system administrators", "DevOps engineers" or "site reliability engineers) are the <a href="https://www.linkedin.com/pulse/agile-operations-chetana-shah?articleId=8151820239830713841">day-to-day operational tasks</a>, ongoing incidents, user-reported system problems. And trying to fit those into two-week sprints is not only pointless, but also dangerous. Just imagine what would've happened if a critical security patch had to wait for two weeks to be applied. Or if a CEO had to wait even a minute for help with mailbox. And I won't even mention stuff like I/O contention or disk space increases. Scrums, with their sprints, user stories, point estimates, velocity charts and stand-ups are a great way or organising work around a project (or a set of those). But what happens every day in Ops teams that use Scrum is that we constantly modify our sprint's task list to accommodate for the unstoppable influx of user-submitted tickets. Incidents. Help requests. Questions. Sizing. Password change requests. Wifi access problems. The list goes on and on. If you're an Ops person, you know how it's like.</p>
+
+<p>Forcing Scrum on operations team just because it's a company policy for development teams isn't the best idea. Or it is, if what you want to achieve is decreasing issue visibility and increasing time to respond and time to resolve. That's why recently I've introduced a hybrid Scrum + Kanban workflow in the team I work in. Kanban differs from Scrum mainly when it comes to workload planning. While in Scrum the issues are picked from backlog and organised in fixed-time sprints, in Kanban the flow in continuous and the notion of sprint has no meaning. Another thing is that in Scrum we optimise for so-called story points (the abstract measure of tasks' complexity) as in Kanban we do that for time to resolve (and sometimes also time to respond). These two factors make Kanban much more suited for the type of work that operations teams usually do, or do in bulk. But sure, we do project work as well. Remember those wonderful acronyms? So implementing one of them can be a project for operations team. And for stuff like that it absolutely makes sense to have Scrum. But what we found out in my team just week after doing stand-ups with two boards was that it creates a lot of confusion; it's hard to know at first glance, which board is the issue on. Fortunately, I've manage to create one, universal board, though it required a compromise.</p>
+
+<p>But still, this isn't everything that Agile Operations consists of in nowadays brave new IT Operations world. </p>
+
+<p>Pets and cattle. Another brilliant example of our New-speak. Another awesome idea to make us more agile. </p>
+
+<p>The <a href="http://www.theregister.co.uk/2013/03/18/servers_pets_or_cattle_cern/">pets and cattle</a> metaphor postulates that in modern IT servers (well, systems really, or VMs) should be treated like cattle, not like pets. So pets you name, of pets you take care, you nurse them back to health when they're sick. Cattle? You number it, you govern it, you shoot it in the head when it stops being perfect.</p>
+
+<p>This difference in thinking about our systems comes mainly from the physical/virtual distinction, but also from the wide-spread of automation and orchestration frameworks. It's a great thing that we can just run an Ansible playbook or apply a Puppet manifest and get a fully-configured system in just few minutes instead of typing magical incantations in the console for hours. I do love automation, I'm not saying I don't.</p>
+
+<p>But.</p>
+
+<p>Carrots are good for your health, right? But try eating like a 100kg of carrots. The point is that everything needs to be properly balanced. Sometimes you just have to go and fix things. Especially if you're in operations. No matter how much your boss optimises you for agility, sometimes you just have to do that.</p>
+
+<p>You know this viral post that spread over ReddIt few weeks back? I know, it was on the internet, so it sure as hell was true. But that's beside the point here. A guy told his story: he has automated his software testing job in 100% and was doing literally nothing for quite a few years. But in the end he was let go. And now the poor thing doesn't remember how to code or do anything useful. Poor, poor thing.</p>
+
+<p>You see? Everything needs to be balanced. Even if we have a perfect automation framework and we can always rebuild faulty systems in minutes with very little manual intervention, we should keep our skills sharp. What if the automation framework breaks? What, if something goes wrong with the hypervisor's OS? What if hardware goes down?</p>
+
+<p>We're the Operations Folk, we are here to resolve problems, we are here to gather knowledge and serve as subject matter experts in, well, operations! Of course, sometimes, maybe even most of the time, the quickest, easiest and most agile way of "resolving" problems is to go around them, but we have to be prepared for when things go so wrong that there's no other way than go deep into the dark command line realm.</p>
+
+<p>We rely on abstractions a lot. We have abstraction layers over abstraction layers. For example, we have bare-metal, than hypervisor OS, than we have VMs, on top of those we have Docker, on Docker we run Docker Compose, than finally we have containers and in containers the applications. So many abstraction layers. Each of which can fail. And your automation framework? How many of those abstraction layers does it account for?</p>
+
+<blockquote>
+  <p>Individual servers don't matter. Individual VMs don't matter. It's the systems that run on top of them that matter. If the infrastructure underneath is failing, don't waste your time trying to figure out why. Throw it out and replace it -- preferably through automation. <a href="http://www.networkworld.com/article/2165267/cloud-computing/why-servers-should-be-seen-like-cows--not-puppies.html">George Reese</a></p>
+</blockquote>
+
+<p>What this quote says to me is basically: "Make your Operations Engineers less and less competent so that companies like mine can take more and more of your business".</p>
+
+<p>Let me say that again: I do love automation and I think it's awesome that we have the ability to rebuild big chunks of our infrastructure. But our systems are complex and there's a lot of things that can go wrong. And things will go wrong. And you can't have support for every black scenario in your automation framework. That's just not possible. I bet most of us can't even think of all the ways our systems can fail. And systems fail. And when <a href="http://web.mit.edu/2.75/resources/random/How%20Complex%20Systems%20Fail.pdf">complex systems fail</a>, they fail hard. This is why we have to be prepared, we have to keep our skills of dealing with failing and failed systems sharp. We always have to be able to rebuild our systems by hand. From the command line. Without any assist from yet another system that can fail in yet another way. </p>
+
+<p>I think that the pets and cattle metaphor is very useful and that treating your servers as the latter can bring good results, increase productivity, agility and ease Ops in their daily, sometimes mundane tasks. But since we are the last line of defence against failures, we have to keep a good balance between how much our job is easy and how competent we are when it comes to our systems. The more automation the better, but we have to remember that there should be always our knowledge behind the framework. Our, not anyone else's.</p>
+
+<p>You know the <a href="http://johnstepper.com/2013/10/26/the-five-monkeys-experiment-with-a-new-lesson/">famous five monkeys experiment</a>? What it basically teaches us is that it's very easy to fall into patterns that we don't fully understand or don't know the basis for. Taking pets and cattle metaphor too far can make us less competent in exactly the same manner. And, what's even worse, can make our organisations like that. If all the we do is tearing down old infra and replacing it with new one without deep understanding of why we do this, the people that will -- sooner or later -- replace us at our desks will not be prepared for when things go really bad. </p>
+
+<p>What's wrong with Agile Operations then? Well, the truth is that Operations was never meant to be as Agile, as Development is. We are here to keep things stable. And to do that, we have to know our stuff. And to know our stuff, we have to, from time to time, go through a crisis and practice our skills of keeping stability and bringing it back.  </p>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>Say hello to Database DevOps Engineer &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/postgresql/2016/08/say-hello-to-database-devops-engineer.html">Say hello to Database DevOps Engineer</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2016-08-12T17:27:00 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/postgresql/2016/08/say-hello-to-database-devops-engineer.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <h1 id="myview:sayhellotodatabasedevopsengineer">My view: Say hello to Database DevOps Engineer</h1>
+
+<p>The Database Administrator is going away for sure. The old-school person with magical SQL abilities and knowing all the caveats there are to know about RDBMSs is doomed in the era of "multipurpose" developers. The "DBA as in Database Advocate" idea carries an important weight, but I feel we should augment the notion a bit.</p>
+
+<p>With the constant growth of so-called "microservices" we - the DBAs of the new age - are faced with many new challenges. The never-ending push toward "agility" makes us re-organise our work totally. We - who were once an island - now find ourselves struggling for inclusion in the broader operations environment, where "control" is an ancient ideal and "human SPOFs" are something to be avoided at any cost. We're not gurus anymore.</p>
+
+<p>The new DBA isn't a "one-trick pony" anymore. If we want to keep up with how things are done now, we should take on the new "DevOps" belief as our own.</p>
+
+<h2 id="butwhythechange">But why the change?</h2>
+
+<p>Nowadays, developers are perceived as "multipurpose", software-creating assets. With the rise of tools bringing coding and administering closer together, developers are now able to create infrastructure as code, deploy entire platforms with a single click, bring new database to life with a push of a button. As <a href="https://www.compose.com/articles/compose-view-say-hello-to-the-database-advocate/">Dj accurately notes</a>, coders these days won't wait for operations people to provide them with the access they need - they will instead spin up a new instance in the cloud.</p>
+
+<p>Another thing is that the way we architect software now is much different, than in the good ol' days. The idea that POSIX and the GNU project came up with over 20 years ago is now seen as the best way in our industry - create simple, autonomous pieces of software that perform one task really well. And connect them together using a common language - an API. If any function has to change - you have to replace just the component performing it. And it seems to work really well on the application level. But what is often forgotten is the low-level data stack. What can be seen more and more often, are sets of microservices operating autonomously on application and API level, but connecting to one and the same database under the scenes. Obviously, allowing this kind of an approach is questionable at best; multiple access patterns can disturb the caching layer and confuse the query planner, overlapping views might cause problems with sequential scans and there is the question of constant schema changes required by many applications for the same set of tables. This was a problem long before microservices came around, granted, but nowadays we're seeing a new application popping up almost every week, so the scale is much bigger now, than it was before. That's a big challenge for the DBAs - not only to educate and advocate for best practices' compliance, but also to keep up with the demand. We need to not only guard existing databases, but also be able to provision new ones in a blink of an eye.</p>
+
+<p>Nowadays DBA isn't "only" a database administrator; we should have a broad skill-set allowing us to maintain the environment in which our precious RDBMSs run to the full extent. We need not only to create databases, but also systems on which they run. We need automation for databases as any other system does. We need to be able to shift our focus from manual labour to orchestration and to do that we have to create our own tools since we are the ones who know, how they should look like and what they should do.</p>
+
+<p>We were always a bit different than other operations people, but now, in this new time, we need to keep up. And to do that, we need to be included in the general operations environment. But we're dragging this baggage behind us and probably because of that we're still being perceived as highly specialised individuals that... well... don't have much to offer apart from their database expertise. But that's not entirely true, since nowadays many people in the DBA field come from a system administration or software development background. It's unfair and unreasonable to deny them the inclusion they need to fully ascend to the "agile" operations world. We're struggling for that inclusion, but obviously the first step should be ours; only after that we can start to be seen as Database DevOps Engineers.</p>
+
+<p>It can be hard to balance, but we shouldn't strive anymore to be some sort of gurus and yet we should still be available and willing the help and assist and yes - advocate as well. Irreplaceable people are always the first to be replaced, so our goal should be to make ourselves as useful as possible while still maintaining our special attention to detail and high level of responsibility. </p>
+
+<p>One other important thing is service continuity. It's really easy to become a "human SPOF" when working in the traditional model. When "silosiation" is highly developed and we have "database guys", "infrastructure guys", "monitoring guys" and so on, the ability to take over from a sick or otherwise gone team member is very limited. And it's especially problematic when it's about databases - these are highly sophisticated pieces of software and knowing them from inside-out takes considerable amount of time. This is just another point for including DBAs more into the broader operations world. We need to become more like the modern sysadmins with their automation and orchestration frameworks, but there's a lot we have to offer them as well. Working with databases requires a special kind of discipline; attention to detail is really high amongst the requirement for a "good" DBA. Standardisation and normalisation are something obvious to us - in the database schemas as well as in the day-to-day operations. Standards. Discipline. Thinking before doing. Standard Operating Procedures. This is what we can bring to the DevOps table.</p>
+
+<h2 id="whatisadatabasedevopsengineer">What is a Database DevOps Engineer?</h2>
+
+<p>Database DevOps Engineer enters and brings with him a plethora of skills ranging from low-level database maintenance, writing and optimising queries, knowing the planner inside-out; but also low-level operating system configuration, picking the right storage and optimising its parameters, taking care of the basic hardware monitoring, creating Munin/Grafana dashboards, writing Nagios/Icinga/Sensu plugins. And of course automating all that stuff using Puppet/Chef/Ansible/Salt, simplifying common tasks with scripts, handling partitioning, LVMs, virtualisation and so on.</p>
+
+<p>A Database DevOps Engineer is, in many aspects, just like any other DevOps guy in the company, just with a "hint" of specialised knowledge on the database side of things. He not only manages databases and protects the data, but also facilitates the evolution of the data layer - by advising the best ways to share the data amongst applications (be it by replication, ETL processes, foreign data wrappers and so on) and by implementing the solutions chosen by other teams in timely and repeatable manner so that when a need arises for another setup like the one chosen, there's already an module/role/playbook/recipe that other, non-DBA team members can use.</p>
+
+<p>Database DevOps Engineer knows about "the cloud", is able to use APIs or containers. He may not like it, but he's ready and willing to listen if there are good arguments for using solutions like this.</p>
+
+<p>Database DevOps Engineer is not afraid of letting go, if the team decided it can take care of their databases on their own. Database DevOps Engineer is there to assist even, if he's not the formal system owner.</p>
+
+<p>Database DevOps Engineer combines his DevOps skills with the database knowledge gathered over many years of experience and uses that to create tools for other teams to use ranging from automation playbooks, single-click deployments to parametrised monitoring dashboards to automated slow query reporting.</p>
+
+<h2 id="whoisadatabasedevopsengineer">Who is a Database DevOps Engineer?</h2>
+
+<p>The good news is that we're not magical unicorns anymore. Nowadays, there's plenty of people in our field that are more or less familiar with databases. It takes time to know some specifics, but even the most knowledgeable of us learn something new everyday. The DBA of the present and the future is someone with a broad experience not limited to just databases. So in fact, provided a certain level of discipline and attention to detail (and willingness to learn, of course), any DevOps Engineer can, in time, add the "Database" prefix to his or her role name.</p>
+
+<p>The natural candidates though for becoming Database DevOps Engineers are those of us - DBAs - who already deal with (or want to, but are denied the chance to) much larger spectrum of technologies, than just the databases alone. We certainly have the mental capabilities to become so much more than we are viewed as, but we should be the first ones to realise that. Becoming more familiar with operating systems, storage arrays, networks, scripting can go a long way towards making our workflow more smooth and our positions more agile-oriented and DevOps-aligned.  </p>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>Backing up PostgreSQL &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/postgresql/2016/06/backing-up-postgresql.html">Backing up PostgreSQL</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2016-06-29T07:00:00 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/postgresql/2016/06/backing-up-postgresql.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>You know this good ol' IT saying: "There are two types of people: those how back up their data and those how are yet to start" Backing up databases is especially important since they usually contain information critical not only to day-to-day business operation, but also for business continuity. People leave, software fails, world changes. What remain is your data and if you have it, you can always start from the scratch - with new software, new people, in new world. Let's have a look at various backups strategies available for PostgreSQL databases so that we can prepare for the worst.</p>
+
+<p><em>This article was <a href="https://www.compose.com/articles/postgresql-backups-and-everything-you-need-to-know/">published</a> by <a href="https://www.compose.io">compose.io</a> as a part of <a href="https://www.compose.io/write-stuff/">Write Stuff</a> programme. Unlike other articles on my blog, this one is licensed under the terms of CC BY-NC-SA 4.0</em></p>
+
+<h1 id="backuptypes:physicalvslogical">Backup types: physical vs logical</h1>
+
+<p>When talking about database backups, the first distinction mentioned is usually about filesystem-level snapshots vs SQL dumps. A database is essentially a bunch of files sitting somewhere on a drive in some datacentre. Backing up files is easy, isn't it? But from another point of view, a database can be perceived as a sequence of SQL statements used to create and manipulate the data. How hard can it be to repeat all these statements?</p>
+
+<p>Both backup types are useful, but each comes with its own set of advantages, disadvantages. And both have some caveats.</p>
+
+<h2 id="physicalbackups">Physical backups</h2>
+
+<p>Physical backups, also known as filesystem-level backups, are basically snapshots of files constituting the database. But with constant writes going to the underlying drives it can be quite hard to make these snapshots internally consistent. <a href="https://www.postgresql.org/docs/9.5/static/continuous-archiving.html">PostgreSQL documentation</a> describes two key notions - continuous archiving and point-in-time recovery. These complement each other and it's important to understand them.</p>
+
+<p>In order for physical backups to be consistent, we have to have a way of guaranteeing transaction atomicity and durability - in other words we have to make sure that we either commit the entire transaction or leave the database unchanged. And if we do commit, it has to be forever. PostgreSQL uses <a href="https://www.postgresql.org/docs/9.5/static/wal-intro.html">write-ahead logging</a> to provide the A and D letters of the <a href="https://en.wikipedia.org/wiki/ACID">ACID</a> acronym. Write-ahead log segments are exactly the files that the continuous archiving process takes care of, well, archiving. And the information kept in WAL segments allows the database engine to keep the data consistent but also to to bring it back to consistent state after a crash.</p>
+
+<p>While it is normal for some database files to change during filesystem backup creation, not all the changes are safe and some may lead to an inconsistent snapshot being created. That's why, apart from <a href="https://www.postgresql.org/docs/9.5/static/app-pgbasebackup.html">some nice</a> <a href="https://www.postgresql.org/docs/current/static/app-pgreceivexlog.html">command line tools</a>, PostgreSQL provides also a low-level API for taking physical backups. Executing <code>pg_start_backups()</code> before and <code>pg_stop_backup()</code> after ensures that there will be no unsafe changes done to the data files during the process. But still it's important to remember that a physical backup is useless without all the WAL segments generated between executing the two functions mentioned above.</p>
+
+<p>Filesystem-level snapshot along with all the WAL segments necessary for its restoration is called a "base backup".</p>
+
+<h3 id="stand-alonephysicalbackupsvspitr-enabledphysicalbackups">Stand-alone physical backups vs PITR-enabled physical backups</h3>
+
+<p>While it was said that continuous archiving and point-in-time recovery complement each other, they can also be decoupled.</p>
+
+<p>It is very useful to have continuous archiving configured so that you are always sure you have access to necessary WAL segments, but in order to have a functional base backup you only need the ones generated while you were creating this backup. If you have only those segments and do not archive the ones generated after your backups is ready, you have a "stand-alone physical backup".</p>
+
+<p>But you can always continue to archive write-ahead log segments (and thus actually have <em>continuous</em> archiving). What that will give you is the ability to restore your database from the base backup you have and then continue to replay WAL segments on it. This is called "point-in-time recovery", since you can always stop replaying the WAL and still have a consistent state; so essentially you can restore your database to any point in time starting with the time you've created your base backup.</p>
+
+<h2 id="logicalbackups">Logical backups</h2>
+
+<p>Logical backups are also know as SQL dumps. This is because they contain SQL statements used to create the database schema and fill it with data. SQL dump always represents a consistent state of the database taken at a given moment since the dumping process follows exactly the same semantics as any other ordinary database session. This also means that it places locks and, on the other hand, can be forced to wait for other sessions to release their locks.</p>
+
+<p><a href="https://www.postgresql.org/docs/current/static/backup-dump.html">PostgreSQL documentation</a> gives an overview of the process. The dumping software simply goes through all the tables discovering their schema and fetching all the rows. Nothing overly complicated, though it has to be clever enough to know about the order in which to go through all the relations so that while restoring all the constraints can be met.</p>
+
+<p>It is perfectly normal for SQL dumps to have tables' data spread over time meaning you while you can have the last row of one table with timestamp A, some other table might have rows with timestamp B. If you have rules outside your database about how rows like that correlate, you should account for that yourself.</p>
+
+<h3 id="entireinstancelogicalbackupsvssingledatabaselogicalbackups">Entire instance logical backups vs single database logical backups</h3>
+
+<p>In one PostgreSQL installation we can have multiple databases - this is <a href="https://www.postgresql.org/docs/9.5/static/creating-cluster.html">referred to</a> as "cluster" in the official documentation, but this term is confusing enough to not to use it, so let's call it simply an "instance".</p>
+
+<p>Although dumping a single database is enough to restore all of its schema and data, there are also some other extra objects that could be necessary to bring the restored database to full operation.</p>
+
+<p>All privileges are dumped with the database, but <a href="https://www.postgresql.org/docs/current/static/user-manag.html">database roles</a>, memberships and attributes are global objects that exist on the instance level and therefore are not included in a single database dump.</p>
+
+<p>PostgreSQL provides two tools for creating logical backups. While <a href="https://www.postgresql.org/docs/current/static/app-pg-dumpall.html">pg_dumpall</a> can be used to dump all the objects in an instance, it can also serve as complementary tool to the other one and dump only the global objects. The other tool is <a href="https://www.postgresql.org/docs/current/static/app-pgdump.html">pg_dump</a> which is used to dump a single database from an instance.</p>
+
+<h1 id="thegoodthebadandthecaveat">The good, the bad and the caveat</h1>
+
+<h2 id="physicalbackups">Physical backups</h2>
+
+<table>
+<col />
+<col />
+<thead>
+<tr>
+	<th>Pros</th>
+	<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>* no locking - physical backups do not cause lock contention and do not depend on other connections releasing their locks</td>
+	<td>* high I/O pressure - copying the entire data directory may put a significant pressure on your storage, but this doesn't have to necessarily apply if you're able to use some sort of filesystem-level snapshotting</td>
+</tr>
+<tr>
+	<td>* entire instance backed up - there's no need to restore single databases - one restore process is enough for entire cluster</td>
+	<td>* entire instance backed up - there's no way to restore single databases or single tables, one has to restore all or nothing</td>
+</tr>
+<tr>
+	<td>* almost instantaneous restore process - no need to execute SQL statements to get data back</td>
+	<td>* very large base backups - physical backups include all the indices and bloat and may therefore be much, much larger than SQL dumps</td>
+</tr>
+<tr>
+	<td>* PITR capabilities - the ability to go back in time</td>
+	<td>* need to archive WAL segments - you need to provide additional storage for binary log files</td>
+</tr>
+<tr>
+	<td>* just works - you just run postgres with the backed up directory and it just works</td>
+	<td>* binary format - having backup in binary files means you are limited to restoring it using exactly the same PostgreSQL version it was created with</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="logicalbackups">Logical backups</h2>
+
+<table>
+<col />
+<col />
+<thead>
+<tr>
+	<th>Pros</th>
+	<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>* less data to copy - logical backups do not copy all data files, so may impose a lower I/O pressure on the system, than physical backups</td>
+	<td>* locking - logical backups are both prone to lock waits and cause lock waits</td>
+</tr>
+<tr>
+	<td>* single database objects can be backed up - it's easy to backup and restore even a single table</td>
+	<td> </td>
+</tr>
+<tr>
+	<td>* smaller backup files - SQL dumps do not contain index data or bloat, so they are much smaller, than physical backups</td>
+	<td>* long restoration process - SQL statements have to executed to get schema and data back</td>
+</tr>
+<tr>
+	<td>* no need for storing extra files - backups are self-contained</td>
+	<td>* no PITR capabilities - a SQL dump can serve only as a snapshot of the data at the time it was created</td>
+</tr>
+<tr>
+	<td>* cross-version compatibility - SQL dumps are not dependant on restoring with the same version as was used to create them</td>
+	<td>* extra effort required - care has to be taken to back up global objects, tune the server to allow for faster restoration etc</td>
+</tr>
+</tbody>
+</table>
+
+<h1 id="compose.iosupportedbackups">Compose.io supported backups</h1>
+
+<p>Compose gives you standalone physical backups. This means you should take extra care of the PostgreSQL version you want to use with your backups.</p>
+
+<p>Since the standard <code>pg_dump</code> tool uses a regular database session, there's nothing stopping you from creating SQL dumps of Compose-hosted database. But, since you don't have access to the database superuser account, you cannot use <code>pg_dumpall</code> to dump global database instance objects.</p>
+
+<p>When it comes to restoring from backups, all you really can do is to use the ones available to you in Compose's WebUI. You might be able to partially restore your SQL dumps, but you'll get errors if you'll try to restore them in full.  </p>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

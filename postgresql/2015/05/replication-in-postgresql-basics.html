@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>Replication in PostgreSQL - basics &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/postgresql/2015/05/replication-in-postgresql-basics.html">Replication in PostgreSQL - basics</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2015-05-19T15:21:00 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/postgresql/2015/05/replication-in-postgresql-basics.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>People familiar with MySQL are usually a bit confused with how replication is done in PostgreSQL. This is due to the fact that there are many ways to do this depending on what you want to achieve.</p>
+
+<p>Probably the most common form of replication used with MySQL is statement-based replication. I even done it myself once or twice. It's easy to set up, doesn't eat up a lot of space, can be audited with text tools. That probably all the advantages. Back in the days this was the only way to do it in MySQL.</p>
+
+<p>In contrast, in PostreSQL we can choose if we want to replicate the whole database cluster<a href="#fn:cluster" id="fnref:cluster" class="footnote">1</a> or only some tables, do we want to use master-slave or multi-master relationship and if we want synchronous or asynchronous replication.</p>
+
+<p>In this post I'll try to explain the basics about replication in Postgres. Obviously though you shouldn't treat it as an exhaustive overview.</p>
+
+<p>So depending on the goal there are few options. Let me break them down for you.</p>
+
+<p>Suppose you are a retailer with a portfolio of few brands each of which has it's own database. But the products are actually the same and the brands are sharing a central warehouse. So you have to have a way of keeping the <code>products</code> and <code>stock</code> tables in both databases in sync, otherwise you risk selling an item that you don't have. <br />
+There are few ways to approach this.</p>
+
+<ol>
+<li>You can have a "main" instance of <code>products</code> and <code>stock</code> writable only by a dedicated product-stock-management application, replicate them in a master-slave mode to the other database and grant read-only access to your webapp users.  </li>
+<li>You can set it up like above but instead of replication use FDW<a href="#fn:fdw" id="fnref:fdw" class="footnote">2</a>.  </li>
+<li>You can use multi-master replication software with some type of conflict handling.</li>
+</ol>
+
+<p>In the first case you would need a trigger-based replication system that would allow you to replicate only given tables without the need to synchronise both databases in full. One of the best tools there are to do this is <a href="http://www.slony.info">Slony-I</a>. I've used it in a few projects for some big clients and it was perfect. Actually, I once had a setup exactly like this running. <br />
+<em>Slony-I</em> is robust, proven and a breeze to administer once you get familiar with it's interfaces (I really like Slony's perl tools).</p>
+
+<p>Second case uses no replication, I just mentioned it for the sake of completeness. Used a similar setup once, though <em>postgres_fdw</em> was quite slow with large tables.</p>
+
+<p>Third case would require you to use also a trigger-based system, but with the ability to do multi-master replication. I tried <a href="http://bucardo.org/">Bucardo</a> once but decided to use <a href="http://www.symmetricds.org/">SymmetricDS</a> instead. Actually I've implemented a quite complex "central warehouse" solution with it and from what I hear it's still working very well.</p>
+
+<p>Another scenario might be when you have a reporting team working on the data that is generated by your webapp, but don't want them to mess up your well-balanced live database server with their heavy reporting queries. <br />
+The obvious choice would be to set up a replicated standby database and point your reporting guys at it. You don't need third-party tools to do that - a native PostgreSQL technology like streaming replication would be perfectly fine for the job. If you want a simple way of managing your setup, I would recommend <a href="http://www.repmgr.org/">repmgr</a>. Used it myself to do exactly what I described.</p>
+
+<p>While trigger-based systems are by their nature asynchronous, you can choose if you want your streaming replication to be synchronous or asynchronous.</p>
+
+<p>The difference is that with asynchronous replication your database will report a transaction as commited when the master reports it complete; with synchronous replication the master will wait for slave(s) to report successful write and only then will the transaction be reported as commited to the user.</p>
+
+<p>So there you have it - you can either replicate single tables or the whole cluster. The former relays on third-party trigger-based solutions and is asynchronous whilst the latter can be done with native streaming replication (or WAL shipping) and can be both asynchronous or synchronous.</p>
+
+<div class="footnotes">
+<hr />
+<ol>
+
+<li id="fn:cluster"><p>This term is used in Postgres for one particular <em>installation</em> that can consist of many <em>databases</em> each of which can contain may <em>schemas</em>.<a href="#fnref:cluster" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:fdw"><p>Foreign Data Wrapper - more <a href="https://wiki.postgresql.org/wiki/Foreign_data_wrappers">here</a><a href="#fnref:fdw" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+</ol>
+</div>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

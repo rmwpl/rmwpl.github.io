@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>High availability taken the wrong way &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/gnu-linux/2015/07/high-availability-taken-the-wrong-way.html">High availability taken the wrong way</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2015-07-25T09:38:00 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/gnu-linux/2015/07/high-availability-taken-the-wrong-way.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>"Hello, IT, did you try turning it off and on again?"</p>
+
+<p>I see this happening over and over again. A network service goes down for some reason. It is critical, it has to run. The person on the rota restarts it. What's wrong with that picture?</p>
+
+<p>Unlike desktop support, IT operations can't afford to just "try turning it off and on again". It's not the way proper maintenance should be done. Be it a junior sysadmin or a regular developer, some people seem to think that high availability is about bringing the service up as fast as it's possible when it fails. Well, not really.</p>
+
+<p>First of all you don't have a HA setup if you have a downtime when one component is faulty. It shouldn't matter to you that something went down, since even before you notice it, another standby element will take over all the functions of the failed one. Automatically. Without any human interaction. It seems obvious, I know, but still there are those who seem to think otherwise. We have plenty of tools allowing a proper HA setup to be done, they existed even before the "DevOps" hype started, but are more and more in spotlight now, when automation is in such demand. Ironically, the old-school sysadmins seem to know better how to use them than the new generation of multi-purpose developers, self-proclaimed "DevOps engineers". These are the guys that I see most often use the "restart as fast as possible" approach.</p>
+
+<p>A daemon is a piece of software that is suppose to run in the background and do it's job continuously; once started, daemon should stay alive till it's stopped manually. If it stops for any other reason, a sysadmin's first and foremost duty is to check, why it went down. Only then, when the cause for failure is know, can the sysadmin bring the daemon back up. I often hear, that "it didn't happen before", "it's the first time", "let's hope it won't happen again" and other types of excuses.</p>
+
+<p>Well, it's a bit naive way of thinking and really, an experience sysadmin shouldn't be telling things like that.</p>
+
+<p>Nothing's flawless. There's no such thing as perfect software, so you should always be prepared for the case that the daemon will fail. It shouldn't, but you have to have a plan for when it does. Restarting it and hoping for the best is not really a plan. It happend once, so it'll for sure happen again, but what if there won't be anyone to bring it up? Of course, you can use helpers like <em>daemontool</em> or <em>perpd</em>, but that's the same kind of an approach.</p>
+
+<p>Let me give you an example. Recently I've been working on a new centralized logging system design utilizing <em>rsyslogd</em>. I tried to keep the configuration as simple as possible, but still, it was quite complex. It was easy to make a mistake and I did. More than once. On one of the servers rsyslog was running under the control of perp. If you don't know it, perp is basically <code>while :; do program; done</code> loop; it'll restart your service when it goes down for whatever reason. It can be usefull, I'll give an example later, but in this particular case it was doing more harm than good. So we have a monitoring system that checks, it the daemons, rsyslog amongst them, are alive. And perp restarts rsyslog wheneven it dies. And I made a mistake in the config file. And it was causing rsyslog to not initialize properly and abort during startup. You get my point? Monitoring didn't catch that since the service was running - for a second or so at a time, but continuously restarted. You might say that the check algorithm was wrong and it should utilize <em>perpls</em>. Yes, you'd be right. But it wasn't doing that, the person setting <em>perpd</em> up didn't thought about that. But ultimately the error was in thinking that it should work like this in the first place.</p>
+
+<p>The point is that when daemons fail, they fail for a reason. Restarting them will only make them fail again. "Doing the same thing over and over again expecting different results is madness" - I believe this one is by Albert Einstein.</p>
+
+<p>Not so long ago I was a witness to a chat between a dev and an op about restarting docker containers. There was docker running on a production host with some important app contenerized, but it failed. Apparently docker daemon didn't went down and the container had <code>--restart=always</code> policy enabled, but with no effect. So the dev asked the op to run the container under perp. So essentialy what he wanted was to put a <code>while :; do program; done</code> loop inside another <code>while :; do program; done</code> loop.</p>
+
+<p>The proper way of handeling cases like this, especially when docker is involved, would be to launch two containers and set up, let's say, <em>keepalived</em> between them. Then, if one will fail the other will take over and the sysadmin on call can <code>docker inspect</code> the failed one or do any other analysis to understand, why it went down in the first place. That being said, this particular situation only strenghten my belief that docker is still a bit too young a technology to be put into production.</p>
+
+<p>There is a place for automatic restarts. The reason why <em>perpd</em> was introduced was to replace cron running php scripts every minute - the process of loading all the includes into php memory was quite heavy and it didn't make any sense to do that just to check that the previous invocation of the script is still running and exit for that reason. So <em>perpd</em> makes it a bit less heavy on the server by restarting the process as soon as it exits. Of course, a different approach could be taken and the script could be written as a proper daemon waiting for new events to show up (in this particular case <em>inotify</em> or <em>icron</em> could be used to notify the daemon on new files waiting for processing), but we have what we have and <em>perpd</em> seems to be a quite reasonable piece of software to do what it does in this case.</p>
+
+<p>When it comes to critical network services, we want them to be reliable. For them to be like that we need to understand, what makes them fail in order to be able to fix the root causes of such a problems. Without that we might as well end with on-call rotas and handle every incident with nagios' event handlers or software like perp.  </p>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

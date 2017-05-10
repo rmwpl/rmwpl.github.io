@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>Many shapes of centralized logging &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/gnu-linux/2015/08/many-shapes-of-centralized-logging.html">Many shapes of centralized logging</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2015-08-08T11:45:20 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/gnu-linux/2015/08/many-shapes-of-centralized-logging.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>You know ELK, right? Elastisearch + Logstash + Kibana stack is now probably a standard tool among system administrators and developers. But if you install ELK and think you're done with your centralized logging system - you're wrong.</p>
+
+<p>Recently I picked up a new idiomatic phrase - "different strokes for different folks". As I don't necessarily agree with how it was used then, I think I can use it now. I'm a great fan of simplicity and I love the unix philosophy of one tool performing one job well. Of course, I also do love awk and perl scripting, but I use standard system utilities like grep, sed, tr, wc and so on very often to perform simple, one-off tasks. When I need to check something in the logs, I'm more likely to log onto the server and just grep them. In contrast, some of my colleagues prefer to open Kibana in their browsers and some like Graylog2 more (given choice between the two I would also go with the latter). And that's really it - "different strokes for different folks".</p>
+
+<p>Systems like ELK stack are really useful mostly for visualising the data hidded in your log files and correlating them. You can do a lot of fancy stuff, but you also have to be willing to pay the price.</p>
+
+<p>Recently I've been working on a new centralized logging system for a bunch of servers generating pretty big amount of logs - most of them coming from web servers and php applications. The need arose to upgrade it since it was getting slower and slower and sometimes it was even causing applications to process data at highly unacceptable rate. I've identified few bottlenecks, but the biggest one was with our central logging server. When I started to work on this I was a fairly new addition to the team and didn't really know, how exactly were the logs handled. What was really weird to me was that none of the logs were actually stored on the servers generating them, but only forwarded to the central server. And forwarded in an unreliable fashion. And on the central server some of them were discarded based on the facility and priority. Enough said - it wasn't a perfect setup.</p>
+
+<p>What is really important for me, especially being the command-line loving type that I am, is having access to raw log entries. But it's not only my preference that is important here. When using software like ELK stack you usually want to have flexibility and speed. It's quite common to index many fields to speed up the queries. And to split the messages into many fields in the first place. This requires a lot of processing power, uses a lot of I/O and take up much more storage than raw log files. Storage is cheap, I know. But still, it's cheaper to have less than more. And I/O isn't that cheap.</p>
+
+<p>My point is that as "different folks" prefer "different strokes" the same goes for different tasks. There is the kind that benefits from visualisation and the ability to correlate information coming from various different sources and there is the kind that benefits from using command-line tools and simple scripts run against text files. Often our fancy charts, graphs and maps are used to display metrics as they come in, they operate more often on a live stream of logs than on archived ones. But sometimes you also have to go back in time to quite old logs to debug a problem or just track something down. It's really convenient to have few days worth of your logs in ELK but it's also important to have access to older ones and you probably don't want your elasticsearch indices bloated.</p>
+
+<p>When designing a centralized logging system you have to take into account few factors:</p>
+
+<ul>
+<li><p>you may need to debug an issue quickly and logging to a remote server is always delayed</p></li>
+<li><p>your central logging server may become a SPoF, crash, have its storage corrupted etc</p></li>
+<li><p>your clients may start generating more messages than the server can handle</p></li>
+<li><p>you may want to use tools that operate on raw text files</p></li>
+<li><p>you may want to or be forced to keep more logs than your ELK (or whatever) can store in an indexed form</p></li>
+<li><p>you probably don't want to end up locked in one particular aggregation and correlation solution</p></li>
+</ul>
+
+<p>These are the lessons that I learned and that's why while building the new system I decided to:</p>
+
+<ul>
+<li><p>store the logs on local server, for a short while, but still keep them on a local storage</p></li>
+<li><p>containerize ELK stack in order to be able to deploy a new node quickly if the need for clustering should arise</p></li>
+<li><p>use rsyslog's RELP<a href="#fn:relp" id="fnref:relp" class="footnote">1</a> as a fast and reliable protocol</p></li>
+<li><p>apart from sending logs to logstash store them also in raw format on the central server's storage in a neat directory/filename structure</p></li>
+</ul>
+
+<p>So the main message I wanted to convey in this article is that you really should think about what you expect from your central logging system. But also, you should really take into account, that in many cases raw log file are irreplaceable. You should keep them even if you don't see the need to - it's cheap and may come in handy when things will go wrong with more complex solutions.</p>
+
+<div class="footnotes">
+<hr />
+<ol>
+
+<li id="fn:relp"><p>Reliable Event Logging Protocol<a href="#fnref:relp" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+</ol>
+</div>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

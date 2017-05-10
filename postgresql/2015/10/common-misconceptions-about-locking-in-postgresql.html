@@ -1,0 +1,295 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>Common misconceptions about locking in PostgreSQL &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/postgresql/2015/10/common-misconceptions-about-locking-in-postgresql.html">Common misconceptions about locking in PostgreSQL</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2015-10-17T16:13:28 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/postgresql/2015/10/common-misconceptions-about-locking-in-postgresql.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>At the core of any good database is a great locking mechanism to ensure that data is quickly, safely and consistently updated. In my work as a DBA though, I've come across many misconceptions about locking and even some senior developers I talked with were unclear as to the internal workings of PostgreSQL. Understanding some of the concepts should go a long way in helping to create faster and more responsive applications.</p>
+
+<p><em>This article was <a href="https://www.compose.io/articles/common-misconceptions-about-locking-in-postgresql/">published</a> by <a href="https://www.compose.io">compose.io</a> as a part of <a href="https://www.compose.io/write-stuff/">Write Stuff</a> programme. Unlike other articles on my blog, this one is licensed under the terms of CC BY-NC-SA 4.0</em></p>
+
+<p>Locks are the key element of PostgreSQL's MVCC<a href="#fn:mvcc" id="fnref:mvcc" class="footnote">1</a> and are absolutly necessary for the database. Without them it would be impossible to tell, which row version is current and therefore correct and RDBMS wouldn't be able to perform operations in the proper order. Let's try to identify some of the common myths about them.</p>
+
+<h2 id="themorelockstheworsethedatabasehealth.">The more locks the worse the database health.</h2>
+
+<p>I hear this quite often. A sysadmin or a developer takes a look at a "locks" munin graph, sees a spike and starts lamenting about how many locks there were/are and how bad that is and that we should do something about it... Well, it isn't like that. <br />
+The first thing to understand is that locks are there to actually guarantee your databases' health. It would be a much worse sign to see an unnaturally low number of locks than it would be to see it high. This number is a reflection of what's going on with your data; if it's too low or perhaps close to zero, it might in fact mean that there's nothing going on, and that's usually a bad thing. Ultimately you want your database to be active, if it isn't, then probably your application is down, your domain expired, your users went with your competition or some other disaster happend. On the other hand you should keep a close eye on high number of locks, but never assume that it's bad until you'll consult with your DBA. <br />
+Another thing to remember is that even a simple transaction will create a bunch of locks - see the following transcript:</p>
+
+<pre><code>demo=# create table dummy (abc int);
+CREATE TABLE
+demo=# insert into dummy select * from generate_series(1,100);
+INSERT 0 100
+demo=# begin;
+BEGIN
+demo=# update dummy set abc = 123;
+UPDATE 100
+demo=# select count(*) from pg_locks where virtualtransaction = (select virtualtransaction from pg_locks where mode='ExclusiveLock' and transactionid::text=txid_current()::text) and (relation = (select relid from pg_stat_user_tables where relname = 'dummy') or relation is null);
+ count 
+ -------
+      3
+ (1 row)
+</code></pre>
+
+<p>There's a good chance that all of these locks will show up on your graph, but that's perfectly normal and there's no point in worrying about it. <br />
+Let's take a closer look:</p>
+
+<pre><code>demo=# select locktype, relation, mode from pg_locks where virtualtransaction = (select virtualtransaction from pg_locks where mode='ExclusiveLock' and transactionid::text=txid_current()::text) and (relation = (select relid from pg_stat_user_tables where relname = 'dummy') or relation is null);
+   locktype    | relation |       mode       
+---------------+----------+------------------
+ relation      |   178844 | RowExclusiveLock
+ virtualxid    |          | ExclusiveLock
+ transactionid |          | ExclusiveLock
+(3 rows)
+</code></pre>
+
+<p>What you can see here are the 3 locks acquired by the <code>UPDATE</code> query we executed before. If you were expecting only one - well, you were wrong. <br />
+First we have <code>RowExclusiveLock</code> - this one tells us that there were some row-level write operations made - we did an <code>UPDATE</code> so no wonder we have a lock in this mode; the second and the third are actually related to each other - you see, when a transaction starts, it takes an <code>ExclusiveLock</code> on its identifier; this is necessary for other transactions to know that this particular one is still in progress. There's a slight difference when it comes to the lock type - until the transaction doesn't make a change in the data it has a virtual identifier; only after a write operation is performed the transaction is assigned a permanent identifier. In our case the transaction first took a lock on it's virtual id and then, after issuing the <code>UPDATE</code> query it also took another one on it's perm id. <br />
+All the locks acquired by a transaction are in effect till its end - be it a <code>COMMIT</code> or a <code>ROLLBACK</code>. <br />
+So, as you can see, there can be many locks even on a database with an average workload and it doesn't have to mean that something is wrong.</p>
+
+<h2 id="alllocksarebad.">All locks are bad.</h2>
+
+<p>This is actually related to the previous myth and it's especially visible in all sorts of graphing systems. There are two kinds of locks, but usually they're both presented on the same graph and this might be confusing even for experienced system administrators (though I've also seen it happen to some junior DBAs). <br />
+So what you really should know and understand is that we have <em>granted</em> locks and we have <em>waiting</em> locks. You shouldn't really worry about the number of <em>granted</em> ones unless you also have a lot of <em>waiting</em> ones. The names might be self-explanatory, but just to be clear let's describe both kinds. <br />
+When a transaction tries to acquire a lock, it might be granted or the transaction might have to wait for it. Let's look at two concurrent sessions:</p>
+
+<pre><code>demo=# \set PROMPT1 '%`date +%Y%m%d-%H:%M:%S` (SESSION 1) %# '
+20150807-22:19:43 (SESSION 1) # begin;
+BEGIN
+20150807-22:19:44 (SESSION 1) # select * from dummy limit 0; abc 
+-----
+(0 rows)
+20150807-22:19:48 (SESSION 1) # select pid, locktype, relation, mode, granted from pg_locks where virtualtransaction = (select virtualtransaction from pg_locks where mode='ExclusiveLock' and transactionid::text=txid_current()::text) and (relation = (select relid from pg_stat_user_tables where relname = 'dummy') or relation is null);
+  pid  |   locktype    | relation |      mode       | granted 
+-------+---------------+----------+-----------------+---------
+ 16815 | relation      |   178844 | AccessShareLock | t
+ 16815 | virtualxid    |          | ExclusiveLock   | t
+ 16815 | transactionid |          | ExclusiveLock   | t
+(3 rows)
+
+                                  demo=# \set PROMPT1 '%`date +%Y%m%d-%H:%M:%S` (SESSION 2) %# '
+                                  20150807-22:19:56 (SESSION 2) # begin;
+                                  BEGIN
+                                  20150807-22:20:00 (SESSION 2) # drop table dummy;
+                                  (...waiting...)
+
+20150807-22:20:12 (SESSION 1) # select pid, locktype, relation, mode, granted from pg_locks where (relation = (select relid from pg_stat_user_tables where relname = 'dummy') or relation is null);  pid  |   locktype    | relation |        mode         | granted 
+-------+---------------+----------+---------------------+---------
+ 16803 | virtualxid    |          | ExclusiveLock       | t
+ 16815 | virtualxid    |          | ExclusiveLock       | t
+ 16803 | relation      |   178844 | AccessExclusiveLock | f
+ 16815 | transactionid |          | ExclusiveLock       | t
+ 16815 | relation      |   178844 | AccessShareLock     | t
+(5 rows)
+</code></pre>
+
+<p>So what you can see here are two sessions running at the same time; first one starts an explicit transaction and does a simple <code>SELECT</code>; second one starts another transaction a bit later and wants to <code>DROP TABLE</code>. As you can see, the first one holds three locks (as described above) - all are granted. The second one needs an <code>AccessExclusiveLock</code> in order to drop the table, but cannot acquire it immediately since there's another conflicting lock granted already (<code>AccessShareLock</code>) - so apart from few <em>granted</em> locks we have now also a <em>waiting</em> lock. <br />
+So granted locks can hurt you only if they're causing other lock types to queue up; if they're not doing that, you can have really a lot of them and you'll still be fine.</p>
+
+<p>As an illustration of the two above myths let's take a look following sample graph:</p>
+
+<p><img src="http://rmw.vipserv.org/locks.png" alt="Locks" id="locks" /></p>
+
+<p>As you can see, there's a one significant spike in the number of AccessShare locks. This doesn't have to mean, that something is wrong, but depending on some other factors it can be an incentive to investigate a bit more.</p>
+
+<h2 id="only_exclusive_locksarebad.">Only <em>exclusive</em> locks are bad.</h2>
+
+<p>Well, it really depends. As demonstrated above, in some cases even light locks can cause problems. It's really important to remember that especially if your application uses long transactions that span over several hours. I had to explain the importance of that to developers more times than I can count - you should close your transactions as soon as possible and check your code over and over again for places that might cause your transactions to "hang". Look again at the previous snippet of our two sessions running in parallel. Now, imagine that the first session is started by your app but something goes wrong and it stays open. You want to deploy a new app version with some migrations adding a new column to <code>dummy</code> table. Well, your migration will fail. And so will your deployment.</p>
+
+<h2 id="lockqueuewhatqueue">Lock queue? What queue?</h2>
+
+<p>Yes, that's actually pretty common. Developers tend to forget that there's a lock queue. Let me show you why you should always remember that. <br />
+Let's go back to our two concurrent sessions again. First one has an open transaction that holds an <code>AccessShareLock</code> on our table, second has a waiting <code>AccessExclusiveLock</code> in order to drop the table. <br />
+Let's fire up two more sessions. Observe:</p>
+
+<pre><code>demo=# \set PROMPT1 '%`date +%Y%m%d-%H:%M:%S` (SESSION 3) %# '
+20150807-16:03:24 (SESSION 3) # select * from dummy;
+(...waiting...)
+
+demo=# \set PROMPT1 '%`date +%Y%m%d-%H:%M:%S` (SESSION 4) %# '
+20150807-16:03:51 (SESSION 4) # select pid, locktype, relation, mode, granted from pg_locks where (relation = (select relid from pg_stat_user_tables where relname = 'dummy') or relation is null);
+  pid  |   locktype    | relation |        mode         | granted 
+-------+---------------+----------+---------------------+---------
+ 20352 | virtualxid    |          | ExclusiveLock       | t
+ 20329 | virtualxid    |          | ExclusiveLock       | t
+ 16803 | virtualxid    |          | ExclusiveLock       | t
+ 16815 | virtualxid    |          | ExclusiveLock       | t
+ 16803 | relation      |   178844 | AccessExclusiveLock | f
+ 16815 | transactionid |          | ExclusiveLock       | t
+ 20329 | relation      |   178844 | AccessShareLock     | f
+ 16815 | relation      |   178844 | AccessShareLock     | t
+(8 rows)
+</code></pre>
+
+<p>So as you can see we have now two <em>waiting</em> locks - an <code>AccessExclusiveLock</code> that the <code>DROP TABLE</code> query is waiting to acquire and <code>AccessShareLock</code> that the new <em>SESSION 3</em> needs in order to execute the <code>SELECT</code> query. <br />
+The lock queue exists for a very simple reason - if the <code>DROP TABLE</code> statement were to succeed, the <code>SELECT</code> query againt the same table issued after the <code>DROP TABLE</code> one should fail. Without lock queue in place the <code>SELECT</code> would simply succeed even though the <code>DROP TABLE</code> issued before it would still be waiting. <br />
+If we go a bit deeper into PostgreSQL's system catalogues and execute the awesome query from the PostgreSQL <a href="https://wiki.postgresql.org/wiki/Lock_Monitoring">wiki</a>, we can even see, what is blocking what:</p>
+
+<pre><code>20150807-16:10:24 (SESSION 4) # \e
+ blocked_pid | blocking_pid 
+-------------+--------------
+       16803 |        20329
+       16803 |        16815
+       20329 |        16803
+       20329 |        16815
+(4 rows)
+</code></pre>
+
+<p>So here you can clearly see, that our first session (pid 16815, so <code>SELECT</code>) blocks second session (pid 16803 - yep, I started it earlier, than the first one) and this one in turn blocks the third (pid 20329). As for the two other rows - well, the query is really helpful, but not really super-exact.</p>
+
+<p>These are the most common myths with regards to locking in PostgreSQL that I did come across when working with developers and partially also system administrators. Do you know any other? If so, please share in comments!  </p>
+
+<div class="footnotes">
+<hr />
+<ol>
+
+<li id="fn:mvcc"><p>Multi-Version Concurrency Control - mechanism ensuring the data consistency when working with many concurrent read/write transactions<a href="#fnref:mvcc" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+</ol>
+</div>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>Pentaho adventure &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/postgresql/2015/07/pentaho-adventure.html">Pentaho adventure</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2015-07-11T10:36:00 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/postgresql/2015/07/pentaho-adventure.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>I've been asked some time ago by a colleague to tell something more about my adventure with Pentaho and how did I make it play nice with PostgreSQL. So here it goes, here's my story.</p>
+
+<p>So a decision had been made to try and migrate from SSAS<a href="#fn:ssas" id="fnref:ssas" class="footnote">1</a> to some alternative which would be preferably cheaper. PostgreSQL was chosen and as a consequence I was hired. Well, they also needed a sysadmin, so it was a pretty sweet deal for them to get one person that actually had experience with both databases and systems.</p>
+
+<p>The first thing I needed to do was to find out what tools I can use to actually make OLAP work with PostgreSQL. I remembered that Paweł, the colleague mentioned above, did some ETL work with Pentaho's Kettle. So I asked him what were his thoughts about using it to do OLAP; he seemed to think it was possible but couldn't provide any details.</p>
+
+<p>So I started my research and pretty soon I did found some comments about Mondrian, another part of Pentaho's suite, that is designed to utilize PostgreSQL-backed databases to do OLAP queries. It could be used with the full suite to design and view OLAP cubes and it also provided a web-service endpoint to access the data. But one major issue with it was that it couldn't be used with MS Excel, and one of the project requirements was that end users shouldn't notice any difference (mayby apart from performance, which was then thought to be improved with the migration) when using their Excel-based dashboards.</p>
+
+<p>I then had a talk with a guy maintaining the SSAS-backed cubes, a certified Microsoft specialist, and he wasn't surprised about it. Generally he was quite pessimistic about Microsoft allowing third-party product to work with Excel since it would be bad for their business with SSAS. But one very positive outcome of this conversation was that I could structure my knowledge about how Excel and SSAS talk to each other. So the industry standard for accessing OLAP is XML/A<a href="#fn:xmla" id="fnref:xmla" class="footnote">2</a> and the query language used is MDX<a href="#fn:mdx" id="fnref:mdx" class="footnote">3</a>. I had something to go on with.</p>
+
+<p>It was a breakthrough for me when I found <em>XMLA Connect</em> - a small, simple Excel plugin allowing the use od XML/A endpoints as pivot table datasource. Wait. XML/A endpoints? Hmm... I remembered that Mondrian provided a web endpoint so I checked the name of it... and it was <em>Xmla</em>! So that was it, I had all the pieces of the puzzle - a backend (PostgreSQL), a middleware (Mondrian/Pentaho) and an interface (XMLA Connect+Excel).</p>
+
+<p>The next step was to acually duplicate the ETL process and do some testing. The data was already there, most of it had been migrate from Oracle to PostgreSQL. So what the ETL actually did was to copy from PostgreSQL to MSSQL, copy some of the non-migrated parts from Oracle to MSSQL and launch the cube-building processes. Since I was working with Postgres as my backend I could skip most of the copying and use FDW<a href="#fn:fdw" id="fnref:fdw" class="footnote">4</a> to connect to Oracle. But it turned out not to be that simple.</p>
+
+<p>The important thing to realise is that what Mondrian actually does is only to translate MDX queries to SQL queries, fetch the results and push them through XML/A endpoint. Of course, you can utilise Pentaho suite to design your OLAP schema, but what you still need is the actual data in the backend. You can try and use your regular OLTP database as the source, but I wouldn't advice doing that - it'll probably be very slow, you can find out more in my <a href="http://travellingsysop.net/postgresql/2015/05/olap-support-in-postgresql.html">previous article on OLAP in PostgreSQL</a>.</p>
+
+<p>To avoid slowness and also to offload read-heavy queries from the primary database I decided to set up two more databases - a read-only replica utilising streaming replication and a Mondrian-dedicated DB for the OLAP schema. My first thought was that I can connect the OLAP-dedicated database to the replicated secondary one using FDW and then transform the data into OLAP-friendly schema utilising materialized views and connect Mondrian to them. It was working, but fetching large amounts of data via foreign data wrapper was really slow.</p>
+
+<p>Since I have a really good amount of experience with Slony-I and I value this solution very much I decided that I can use it to feed my OLAP-dedicated DB with the data instead of using slow FDW. It turned out to be a good decision. So I had a working ETL process consisting of two types of replication between three databases, of materialized views and some custom perl script that I wrote in order to refresh the MV's in parallel.</p>
+
+<p>Next big thing on my list was to actually create the cubes using Pentaho's Schema Designer. It's a pretty nice tool, allowed me to do the ground work, but some more complex cubes I had to do by hand. The good thing was though that I already had the XML files generated by Schema Designer, so altering them was quite simple. Actually, at this point I was almost certain I could complete the project, so I was determined to make it work.</p>
+
+<p>Finally I had the working solution that duplicated all the futures of SSAS-backed cubes. The only problem was that it was quite slow in cases when Mondrian couldn't find any preaggregated materialized views and had to issue complex SQL queries. This I also covered in a bit more detail in the <a href="http://travellingsysop.net/postgresql/2015/05/olap-support-in-postgresql.html">previous article</a>.</p>
+
+<p>So it was a quite long road making Pentaho/Mondrian work with PostgreSQL and provide data for MS Excel-based dashboards, it took me around 5 months with figuring out how the cubes work on SSAS through research on OLAP in Postgres to actual PoC and to the final solution, but obviously I had a lot of other responsibilities and could only spend a part of my time on this. But it was a great experience, I learned a lot and judgeing from Google's answers nobody ever did such a big project connecting all the dots together, but maybe I just didn't find it or it was done but not published.</p>
+
+<p>Well, here it is published now and I sincerely hope it will be of use to the community.</p>
+
+<div class="footnotes">
+<hr />
+<ol>
+
+<li id="fn:ssas"><p>Microsoft's SQL Server Analysis Services<a href="#fnref:ssas" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:xmla"><p>XML for Analysis<a href="#fnref:xmla" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:mdx"><p>Multi-Dimensional Expressions<a href="#fnref:mdx" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="fn:fdw"><p>Foreign Data Wrapper - PostgreSQL technique for accessing foreign data as you would access regular postgres tables<a href="#fnref:fdw" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+</ol>
+</div>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>

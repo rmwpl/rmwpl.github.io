@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<!--
+    Strata by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+              <title>What's wrong with DevOps? &larr; Travelling SysOp</title>
+              <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="Robert M. Wysocki - blog on GNU/Linux and PostgreSQL" />
+        <meta name="keywords" content="postgresql linux gnu technology" />
+        <!--[if lte IE 8]><script src="/css/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/css/cookiecuttr.css" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/favicon/server---database-152-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/favicon/server---database-144-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/images/favicon/server---database-120-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/favicon/server---database-114-171423.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/favicon/server---database-72-171423.png" />
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon/server---database-57-171423.png" />
+        <link rel="icon" href="/images/favicon/server---database-32-171423.png" sizes="32x32" />
+        
+        <script src="/meta/0001/01/bundle.js"></script>
+        <noscript>
+            
+            <link rel="stylesheet" href="/meta/0001/01/bundle.css" />
+        </noscript>
+        <script>
+            $(document).ready(function () {
+                $.cookieCuttr({
+                  cookieAnalyticsMessage: 'This site uses cookies to provide a better experience and collect statistics. Disable them in your web browser if you do not want them.',
+                  cookieAcceptButtonText: 'Okay'
+                });  
+            });
+        </script>
+       <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Person",
+            "name": "Robert M. Wysocki",
+            "givenName": "Robert",
+            "additionalName": "Mateusz",
+            "familyName": "Wysocki",
+            "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
+            "url": "http://travellingsysop.net",
+            "image": "http://travellingsysop.net/images/por2.jpg",
+            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+          }
+        </script>
+        <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
+    </head>
+    <body id="top">
+
+        <!-- Header -->
+            <header id="header">
+                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <h1>
+                  <strong>Robert M. Wysocki</strong><br />
+                  travelling<br />
+                  GNU/Linux SysOp<br />
+                  <span class="accent">&</span> PostgreSQL DBA<br />
+                </h1>
+            </header>
+
+        <!-- Main -->
+            <div id="main">
+
+                <!-- One -->                    <section id="one">
+                        <header class="major">
+                            <h2><a href="/gnu-linux/2015/07/whats-wrong-with-devops.html">What's wrong with DevOps?</a></h2>
+                            <h5>
+                            
+                              <span class="date fa-calendar"> 2015-07-04T10:45:00 BST &#9474; </span>
+                            
+                              <span class="disqus fa-comments disqus-comment-comment">&nbsp;
+                                <a href="/gnu-linux/2015/07/whats-wrong-with-devops.html#disqus_thread">Comment</a>
+                              </span>
+                            </h5>
+                        </header>
+                        <p>Imagine you're ill and you go to a doctor. But instead of letting her examine you, you start to tell her how she should do it, what tools should she use, what medical diagnosis should she give you. <br />
+Sounds ridiculous, doesn't it?</p>
+
+<p>Actually, this is exactly the same kind of behavior many software developers nowadays present towards system administrators.</p>
+
+<p>I have a long track record as a SysOp, so I remember the days before DevOps. It wasn't like that; developers were doing their job and relying on system administrators to do their own. There was trust and respect. Going both ways. Unfortunately after some time came the new generation of programmers - young, rebellious, arrogant even. But I don't blame DevOps, it's just a notion, by itself causes no action.</p>
+
+<p>This is a buzzword really. People are fascinated with it since it looks like it brings something new, fresh. A very good writeup on what DevOps is meant to be was done by Klint Finley in <a href="http://www.wired.com/2015/05/devops-isnt-job-still-important/">his article</a> <br />
+Personally I've never met two people having the same understanding of what DevOps is. For me it's a work methodology in which Devs and Ops operate together to achive a common goal, but doing that they remain separete and work in their own ways that are specific to them. This is how I remember my work as a sysadmin even before the birth of DevOps notion. <br />
+But nowadays what I see more and more is another interpretation in which DevOps stands more for a position description than for a methodology name. "DevOps guy" or even "DevOps" without any noun is a holy grail, someone to bow year head before, with skills ranging from coding through testing to system administration. And since this kind of thinking is getting quite popular there's a lot of usurpatory DevOps' being in fact Devs with the mission of telling Ops how they think we should do our job. Plague.</p>
+
+<p>I have never come across an Op telling a Dev how to do coding, but as an Op I constantly have to face Devs telling me, how I should do systems administration.</p>
+
+<p>This is wrong. Our worlds are different, there should be a clear line of communication between them and a constant exchange of thoughts should be going on, but it's impossible to make us into one position, to fit Devs and Ops into the same mindset. Usually when Devs are creating tickets for Ops or want us to do something, they don't <strong>tell</strong> us what they <strong>need</strong> but instead <strong>state</strong> what in their opinion <strong>should be done</strong>. Instead of describing the goal they describe the process. This is the total opposite of effective communication! Most requests formed this way are incomprehensible for Ops because ways of doing things differ a lot between us and Devs and when an Op sees Dev's way of doing some system administration task he usually shakes his head in disbelief and asks "Why...?!". <br />
+It's like Devs do not believe in our skills, it's like they think they know better, it's like we're there only to type what the Dev dictates us. Come on, you have your own keyboards, if you think you can do stuff better than us just go and do it yourselves. Or even better - actually apply for our jobs!</p>
+
+<p>Just recently I "learned" from a Dev that bash scripts are bad, because... they're written in bash. Well, of course, for a complex script a proper interpreted language like perl would be a better choice, but the Dev was referring to a script written by a system administrator to automate system administration task. And the icing on the cake is that the Dev on a daily basis does his programming in... php. The point is that the decision how to do the job should be in the hands of person doing it, especially if the person is in a senior position. Advise is of course welcome, but not in the form of "I'm a Dev so I know better how to do programming". Any discussion how to do system administration tasks can only take place between system administrators. <br />
+Basically it doesn't make sense at all to hire smart people and then tell them what to do. You hire smart people so <em>they</em> can tell <em>you</em> what to do. That's actually a quote, but I don't remember by whom. <br />
+It doesn't matter that a Dev would do the script in a different way - we are capable of choosing our tools of trade, we have the skills to use them, we should be trusted with our tasks. Sometimes I get the feeling that Devs think that sysadmins are "just" Ops because they weren't good enough to become programmers. Actually we love what we do. Most of sysadmins that I know do not dream about becoming Devs and yet it seems like Devs think they should educate us and force their work methodology on us. Go away.</p>
+
+<p>The more senior I get in my role as an Op the more I find myself listening. I guess that's natural, discussion and listening as a part of it becomes pretty important when you're expected to design highly available environment or automate a complex task. I'm open to new ideas, new tools. But to actually be able to do my job well I need the ability to choose myself. Brain storms are suppose to help, not to force something on you.</p>
+
+<p>There's a reason why there are Devs and there are Ops. There's a reason why we work in different ways. There's a reason why this shouldn't change.</p>
+
+<p>The main difference is probably that Devs get things done while Ops get things right. Of course it's totally possible to get things done and right at the same time, but we all know how it is with deadlines and this kind of stuff. Yes, agile approach proabably changed the landscape a lot, but in the end it's all about the mindset. <br />
+Why bother with FHS when you can just drop an app in <code>/home</code>, who cares if you're using public addresses in your private network, why should you compress old log files and delete old docker images when you can just add more storage? Tracking down memory leaks? Mate, just increase RAM. Code refactoring? Haha, create another EC2 instance instead! This is getting things done. This is exactly why we shake our heads in disbelief.</p>
+
+<p>Ops do not treat environments as playgroud where you can have fun, rather like a garden that you have to take care of. Ops do not play with each and every new toy, rather they use proven tools that they know and trust. We are meticulous. We care about details. We do a lot of things that may seem like <em>l'art pour l'art</em>, but they're not. It may look like we do not get many things done or that we're sometimes slow, but it's because we actually <strong>care</strong> about doing stuff the proper way, about getting things right.</p>
+
+<p>Someone has to push the envelope and it's okay to do that. But someone also has to guard your apps from downtimes. I often see those self-proclaimed DevOps' declaring live, production environments their playgrounds and playing with their toys there. This is exactly why Ops are here - to tell you that putting into production a technology that came online like 2 weeks ago isn't really the best idea. And to <strong>not</strong> add your public key to root's <code>authorized_keys</code>.</p>
+
+<p>There's a lot talk right now going on about agile operations. This is closely related to what I'm trying to explain here, but I'll do another article on that.</p>
+
+<p>I once attended a company meeting where our cheif IT security officer talked about how we should take care of our data, how we should adhere to IT security policies. And few minutes after the talk I overhead a group of most senior developers in the company chatting how they do exactly the stuff that he told them not to do on a daily basis. I might have understood if that was junior stuff, but they weren't. It's really frightening how sometimes Devs can despise us, the "hard IT" guys.</p>
+
+<p>So to answer <em>the question</em> - the main thing that's wrong with DevOps from an Op's perspective are Devs thinking they can do Ops' job and telling Ops how they should do it.</p>
+
+<p>All that being said I understand perfectly that we need each other. Systems would be useless without the applications and applications couldn't run without systems. We need to cooperate to achieve the common goal which is to deliver better experience to the end users. It would be really nice though if the effort wouldn't always be only on one side. It would be perfect if we - Ops - could do our jobs without constant hovering and commentary provided by Devs.  </p>
+
+                        <hr/>
+                        <p>If you like this article please consider sharing it with your friends.</p>
+                        <ul class="actions">
+                            <li><div class="addthis_sharing_toolbox"></div></li>
+                            <li>
+                                <div id="disqus_thread"></div>
+                                <script type="text/javascript">
+                                    /* * * CONFIGURATION VARIABLES * * */
+                                    var disqus_shortname = 'rmwpl';
+                                    
+                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                    (function() {
+                                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+                            </li>
+                        </ul>
+                    </section>
+            </div>
+
+        <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
+                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <br />
+                    <li class="fa fa-gear"> Built with: <a href="http://vanilladraft.com/dapper/">Dapper</a> and <a href="http://www.perl.org">perl</a></li>
+                    <li>
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0; text-decoration:none;" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" />
+                        Copyleft: Robert M. Wysocki</a>
+                    </li>
+                </ul>
+            </footer>
+
+        <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5557bc9c7e0bede0" async="async"></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES * * */
+            var disqus_shortname = 'rmwpl';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-63081003-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+    </body>
+</html>
