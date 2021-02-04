@@ -7,67 +7,67 @@
 <!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
 
 <url>
-  <loc>http://travellingsysop.net/</loc>
+  <loc>http://rmwpl.github.io/</loc>
   <lastmod>2016-08-25T19:08:29+01:00</lastmod>
   <changefreq>hourly</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2016/08/say-hello-to-database-devops-engineer.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2016/08/say-hello-to-database-devops-engineer.html</loc>
   <lastmod>2016-08-12T17:27:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2016/06/backing-up-postgresql.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2016/06/backing-up-postgresql.html</loc>
   <lastmod>2016-06-29T07:00:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/gnu-linux/2016/06/whats-wrong-with-agile-operations.html</loc>
+  <loc>http://rmwpl.github.io/gnu-linux/2016/06/whats-wrong-with-agile-operations.html</loc>
   <lastmod>2016-06-22T18:50:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2016/03/bloat-origins-monitoring-and-managing.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2016/03/bloat-origins-monitoring-and-managing.html</loc>
   <lastmod>2016-03-13T14:20:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2016/01/elephant-watching.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2016/01/elephant-watching.html</loc>
   <lastmod>2016-01-10T20:38:55+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2015/11/its-a-view-its-a-table-no-its-a-materialized-view.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2015/11/its-a-view-its-a-table-no-its-a-materialized-view.html</loc>
   <lastmod>2015-11-24T14:24:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2015/10/common-misconceptions-about-locking-in-postgresql.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2015/10/common-misconceptions-about-locking-in-postgresql.html</loc>
   <lastmod>2015-10-17T16:13:28+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/gnu-linux/2015/08/many-shapes-of-centralized-logging.html</loc>
+  <loc>http://rmwpl.github.io/gnu-linux/2015/08/many-shapes-of-centralized-logging.html</loc>
   <lastmod>2015-08-08T11:45:20+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/gnu-linux/2015/07/high-availability-taken-the-wrong-way.html</loc>
+  <loc>http://rmwpl.github.io/gnu-linux/2015/07/high-availability-taken-the-wrong-way.html</loc>
   <lastmod>2015-07-25T09:38:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2015/07/pentaho-adventure.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2015/07/pentaho-adventure.html</loc>
   <lastmod>2015-07-11T10:36:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/gnu-linux/2015/07/whats-wrong-with-devops.html</loc>
+  <loc>http://rmwpl.github.io/gnu-linux/2015/07/whats-wrong-with-devops.html</loc>
   <lastmod>2015-07-04T10:45:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2015/05/olap-support-in-postgresql.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2015/05/olap-support-in-postgresql.html</loc>
   <lastmod>2015-05-29T16:37:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2015/05/replication-in-postgresql-basics.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2015/05/replication-in-postgresql-basics.html</loc>
   <lastmod>2015-05-19T15:21:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/gnu-linux/2015/05/what-you-should-install-even-before-munin-node.html</loc>
+  <loc>http://rmwpl.github.io/gnu-linux/2015/05/what-you-should-install-even-before-munin-node.html</loc>
   <lastmod>2015-05-18T17:16:30+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url><url>
-  <loc>http://travellingsysop.net/postgresql/2015/05/basic-control-over-query-planner.html</loc>
+  <loc>http://rmwpl.github.io/postgresql/2015/05/basic-control-over-query-planner.html</loc>
   <lastmod>2015-05-17T18:35:00+01:00</lastmod>
   <changefreq>daily</changefreq>
 </url>

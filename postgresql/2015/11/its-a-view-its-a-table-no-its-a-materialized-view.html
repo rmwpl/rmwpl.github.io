@@ -46,9 +46,9 @@
             "additionalName": "Mateusz",
             "familyName": "Wysocki",
             "description": "highly experienced GNU/Linux administrator and PostgreSQL DBA",
-            "url": "http://travellingsysop.net",
-            "image": "http://travellingsysop.net/images/por2.jpg",
-            "sameAs": [  "http://travellingsysop.net",  "http://travellingsysop.net/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
+            "url": "http://rmwpl.github.io",
+            "image": "http://rmwpl.github.io/images/por2.jpg",
+            "sameAs": [  "http://rmwpl.github.io",  "http://rmwpl.github.io/meta/0001/01/contact.html",  "http://plus.google.com/114199101243673456767",  "http://www.linkedin.com/in/rmwysocki"  ]
           }
         </script>
         <!--[if lte IE 8]><link rel="stylesheet" href="/css/ie/v8.css" /><![endif]-->
@@ -57,7 +57,7 @@
 
         <!-- Header -->
             <header id="header">
-                <a href="http://travellingsysop.net" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
+                <a href="http://rmwpl.github.io" class="image avatar"><img src="/images/por2.jpg" alt="" /></a>
                 <h1>
                   <strong>Robert M. Wysocki</strong><br />
                   travelling<br />
@@ -248,7 +248,7 @@ So I did some modifications to the first draft of the stored procedure.</p>
 
 <h1 id="otherscenarios">Other scenarios</h1>
 
-<p>Aggregates, joins, very large tables with huge amounts of data and numer of columns and queries with possibly many predicates - with all of these MATERIALIZED VIEWs can help and their uses are not limited to OLTP databases. In fact, <a href="http://travellingsysop.net/postgresql/2015/05/olap-support-in-postgresql.html">OLAP</a> is another paradigm in which MATVIEWs can be extremely useful. Crunching numbers while also fetching data can take some time, and users usually expect their reports and cubes to be fast. Good schema design is important, but if data freshness isn't the major concern, using MATERIALIZED VIEWs can speed things up greatly.</p>
+<p>Aggregates, joins, very large tables with huge amounts of data and numer of columns and queries with possibly many predicates - with all of these MATERIALIZED VIEWs can help and their uses are not limited to OLTP databases. In fact, <a href="http://rmwpl.github.io/postgresql/2015/05/olap-support-in-postgresql.html">OLAP</a> is another paradigm in which MATVIEWs can be extremely useful. Crunching numbers while also fetching data can take some time, and users usually expect their reports and cubes to be fast. Good schema design is important, but if data freshness isn't the major concern, using MATERIALIZED VIEWs can speed things up greatly.</p>
 
 <p>Another use case is simply keeping data in sync. If you have for example many dimension tables that are often updated, you may end up with inconsitent reports when running an "old" fact table against a "newer" dimension table. MATERIALIZED VIEW can keep all of those in sync by using a single, consistent snapshot while refreshing.</p>
 
@@ -315,7 +315,7 @@ So I did some modifications to the first draft of the stored procedure.</p>
                 <ul class="icons">
                     <li><a href="http://www.linkedin.com/in/rmwysocki" class="icon fa-linkedin-square"><span class="label">LinkedIn</span></a></li>
                     <li><a href="http://plus.google.com/114199101243673456767" class="icon fa-google-plus-square"><span class="label">Google+</span></a></li>
-                    <li><a href="http://travellingsysop.net/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+                    <li><a href="http://rmwpl.github.io/meta/0001/01/contact.html" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
                 </ul>
                 <ul class="copyright">
                     <li>Layout: <a href="http://html5up.net">HTML5 UP</a></li>
